@@ -4,6 +4,11 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
+
+import Authentication from "./Authentication/server.mjs";
 mongoose.set("strictQuery", false);
 
 dotenv.config();
@@ -20,6 +25,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/api/v1", Authentication);
+// app.use("/api/v2", apiv2);
 
 const __dirname = path.resolve();
 app.use("/", express.static(path.join(__dirname, "./Frontend/build")));
