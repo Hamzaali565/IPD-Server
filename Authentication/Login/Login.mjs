@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(200).send({ message: error.message });
+    res.status(400).send({ message: error.message });
   }
 });
 

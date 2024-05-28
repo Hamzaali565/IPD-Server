@@ -11,7 +11,7 @@ router.use("", async (req, res, next) => {
       next();
     });
   } catch (error) {
-    res.status(200).send({ message: error.message });
+    res.status(400).send({ message: error.message });
   }
 });
 
