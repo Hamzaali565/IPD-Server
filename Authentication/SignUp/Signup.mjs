@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import { hospitalUserModel } from "../../DBRepo/AuthModels/signUpModel.mjs";
+import moment from "moment";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.post("/signup", async (req, res) => {
       userId,
       userName,
       password: hashedPass,
+      createdOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
     });
 
     res.status(200).send({ data: createUser });

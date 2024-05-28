@@ -1,0 +1,29 @@
+import express from "express";
+import { hospitalUserModel } from "../../DBRepo/AuthModels/signUpModel.mjs";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+const router = express.Router();
+
+router.post("/login", async (req, res) => {
+  try {
+    const { userId, password } = req.body;
+    if (!userId || !password) throw new Error("BOTH PARAMETERS ARE REQUIRED!!");
+    const userCheck = await hospitalUserModel.find({ userId });
+    if (userCheck.length === 0) throw new Error("USER DOES NOT EXIST!!");
+    let match = await bcrypt.compare(password, userCheck[0].password);
+    if (!match) throw new Error("YOU HAVE ENTERED WRONG PASSWORD!!");
+    let token = jwt.sign(
+      {
+        _id: userCheck[0]._id,
+        userId: userCheck[0].userId,
+        iat: Math.floor(Date.now() / 1000) - 30,
+      },
+      SECRET
+    );
+    res.cookie("token", token, { httpOnly: true });
+    res.status(200).send({});
+  } catch (error) {
+    res.status(200).send({ message: error.message });
+  }
+});
