@@ -27,7 +27,6 @@ app.use(
     credentials: true,
   })
 );
-
 app.use("/api/v1", Authentication);
 app.use("/api/v1", Auth);
 app.use("/api/v1", Prod);

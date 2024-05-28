@@ -17,22 +17,22 @@ router.post("/login", async (req, res) => {
     if (!match) throw new Error("YOU HAVE ENTERED WRONG PASSWORD!!");
     let token = jwt.sign(
       {
-        _id: userCheck[0]._id,
+        id: userCheck[0]._id,
         userId: userCheck[0].userId,
         iat: Math.floor(Date.now() / 1000) - 30,
       },
       SECRET
     );
-    res.cookie("token", token, {
+    res.cookie("Token", token, {
+      maxAge: 86_400_000,
       httpOnly: true,
-      sameSite: "None",
-      secure: false, // Set to true if your site is HTTPS
+      // sameSite: "none", // Comment out in development
+      // secure: true,      // Comment out in development
     });
     res.status(200).send({
       data: {
         userName: userCheck[0].userName,
         userId: userCheck[0].userId,
-        password: userCheck[0].password,
         token,
       },
     });
