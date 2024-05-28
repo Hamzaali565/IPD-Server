@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
+const SECRET = process.env.SECRET || "topsecret";
+
 router.post("/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
@@ -22,8 +24,17 @@ router.post("/login", async (req, res) => {
       SECRET
     );
     res.cookie("token", token, { httpOnly: true });
-    res.status(200).send({});
+    res.status(200).send({
+      data: {
+        userName: userCheck[0].userName,
+        userId: userCheck[0].userId,
+        password: userCheck[0].password,
+        token,
+      },
+    });
   } catch (error) {
     res.status(200).send({ message: error.message });
   }
 });
+
+export default router;

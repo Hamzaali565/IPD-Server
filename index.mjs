@@ -8,7 +8,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import bodyParser from "body-parser";
 
-import Authentication from "./Authentication/server.mjs";
+import Authentication from "./Routes/Authentications/Auth.mjs";
+import Auth from "./Routes/Authentications/Auth.mjs";
 mongoose.set("strictQuery", false);
 
 dotenv.config();
@@ -27,7 +28,7 @@ app.use(
 );
 
 app.use("/api/v1", Authentication);
-// app.use("/api/v2", apiv2);
+app.use("/api/v1", Auth);
 
 const __dirname = path.resolve();
 app.use("/", express.static(path.join(__dirname, "./Frontend/build")));
