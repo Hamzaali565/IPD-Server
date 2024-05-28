@@ -10,6 +10,7 @@ import bodyParser from "body-parser";
 
 import Authentication from "./Routes/Authentications/Auth.mjs";
 import Auth from "./Routes/Authentications/Auth.mjs";
+import Prod from "./API/Product/Product.mjs";
 mongoose.set("strictQuery", false);
 
 dotenv.config();
@@ -22,13 +23,14 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://lab-model-v2.vercel.app"],
+    origin: ["http://localhost:3000", "*"],
     credentials: true,
   })
 );
 
 app.use("/api/v1", Authentication);
 app.use("/api/v1", Auth);
+app.use("/api/v1", Prod);
 
 const __dirname = path.resolve();
 app.use("/", express.static(path.join(__dirname, "./Frontend/build")));

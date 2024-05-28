@@ -23,7 +23,11 @@ router.post("/login", async (req, res) => {
       },
       SECRET
     );
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: false, // Set to true if your site is HTTPS
+    });
     res.status(200).send({
       data: {
         userName: userCheck[0].userName,
