@@ -26,8 +26,8 @@ router.post("/login", async (req, res) => {
     res.cookie("Token", token, {
       maxAge: 86_400_000,
       httpOnly: true,
-      // sameSite: "none", // Comment out in development
-      // secure: true,      // Comment out in development
+      sameSite: "none", // Comment out in development
+      secure: true, // Comment out in development
     });
     res.status(200).send({
       data: {
