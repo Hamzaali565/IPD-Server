@@ -1,0 +1,25 @@
+import moment from "moment";
+import mongoose from "mongoose";
+
+const IPDWardCharges = new mongoose.Schema({
+  party: { type: String, required: true },
+  wardName: { type: String, required: true },
+  wardCode: { type: String, required: true },
+  bedDetails: [
+    {
+      bedCode: { type: String },
+      bedCharges: { type: Number },
+      status: { type: Boolean },
+    },
+  ],
+  updateUser: { type: String, required: true },
+  lastUpdate: {
+    type: String,
+    required: true,
+  },
+});
+
+export const IPDWardChargesModel = mongoose.model(
+  "IPDWardCharges",
+  IPDWardCharges
+);
