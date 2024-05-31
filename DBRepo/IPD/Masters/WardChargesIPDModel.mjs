@@ -7,7 +7,8 @@ const IPDWardCharges = new mongoose.Schema({
   wardCode: { type: String, required: true },
   bedDetails: [
     {
-      bedCode: { type: String },
+      bedNumber: { type: String },
+      bedId: { type: mongoose.ObjectId },
       bedCharges: { type: Number },
       status: { type: Boolean },
     },
