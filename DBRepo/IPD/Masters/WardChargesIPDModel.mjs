@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 const IPDWardCharges = new mongoose.Schema({
   party: { type: String, required: true },
   wardName: { type: String, required: true },
-  wardCode: { type: String, required: true },
   bedDetails: [
     {
       bedNumber: { type: String },
@@ -14,10 +13,7 @@ const IPDWardCharges = new mongoose.Schema({
     },
   ],
   updateUser: { type: String, required: true },
-  lastUpdate: {
-    type: String,
-    required: true,
-  },
+  lastUpdate: { type: String },
 });
 
 export const IPDWardChargesModel = mongoose.model(

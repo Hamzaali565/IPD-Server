@@ -33,4 +33,22 @@ router.get("/ipdbeds", async (req, res) => {
   }
 });
 
+router.get("/ipdward", async (req, res) => {
+  try {
+    const response = await IPDBedModel.find({}, "wardName");
+    if (response.length <= 0) throw new Error("NO WARDS FOUND!!!");
+    const uniqueWardNames = response.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.wardName === item.wardName)
+    );
+    const nameChange = uniqueWardNames.map((items) => ({
+      name: items?.wardName,
+      _id: items?._id,
+    }));
+    nameChange.unshift({ name: "--" });
+    res.status(200).send({ data: nameChange });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
 export default router;
