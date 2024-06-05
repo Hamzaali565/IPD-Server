@@ -81,7 +81,7 @@ router.get("/servicecharges", async (req, res) => {
         charges: 0,
         statue: false,
       }));
-      res.status(200).send({ data1: updatedServiceName });
+      res.status(200).send({ data: updatedServiceName });
       return;
     }
     const bedId = serviceCharges[0].serviceDetails.map((items) =>
