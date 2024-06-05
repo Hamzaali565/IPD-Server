@@ -7,24 +7,10 @@ const router = express.Router();
 
 router.post("/serviceCharges", async (req, res) => {
   try {
-    const {
-      parentId,
-      parentName,
-      wardName,
-      party,
-      serviceDetails,
-      updatedUser,
-      _id,
-    } = req.body;
+    const { parentName, wardName, party, serviceDetails, updatedUser, _id } =
+      req.body;
     if (
-      ![
-        parentId,
-        parentName,
-        wardName,
-        party,
-        serviceDetails,
-        updatedUser,
-      ].every(Boolean)
+      ![parentName, wardName, party, serviceDetails, updatedUser].every(Boolean)
     )
       throw new Error("ALL PARAMETERS ARE REQUIRED");
 
@@ -33,34 +19,39 @@ router.post("/serviceCharges", async (req, res) => {
         { _id: _id },
         {
           $set: {
-            parentId,
             parentName,
             wardName,
             party,
             serviceDetails,
             updatedUser,
-            updatedOn: `${moment(Date.now()).format("DD:MM:YYYY  HH:mm:ss")}`,
+            updatedOn: `${moment(Date.now()).format("DD/MM/YYYY  HH:mm:ss")}`,
           },
         },
         { new: true }
       );
-      res.status(200).send({ data: updateServiceCharges });
+      res.status(200).send({ data1: updateServiceCharges });
       return;
     }
     if (serviceDetails.length <= 0)
       throw new Error("SERVICE DETAILS ARE REQUIRED!!!");
     serviceDetails.map((item, index) => {
-      if (![item?.serviceName, item?.charges, item?.status])
+      if (
+        ![
+          item?.serviceName,
+          item?.charges,
+          item?.status,
+          item?.serviceId,
+        ].every(Boolean)
+      )
         throw new Error(`SOME DATA MISS AT LINE NUMBER ${index + 1}`);
     });
     const response = await serviceChargesModel.create({
-      parentId,
       parentName,
       wardName,
       party,
       serviceDetails,
       updatedUser,
-      updatedOn: `${moment(Date.now()).format("DD:MM:YYYY  HH:mm:ss")}`,
+      updatedOn: `${moment(Date.now()).format("DD/MM/YYYY  HH:mm:ss")}`,
     });
     res.status(200).send({ data: response });
     return;
@@ -90,12 +81,33 @@ router.get("/servicecharges", async (req, res) => {
         charges: 0,
         statue: false,
       }));
-      res.status(200).send({ data: updatedServiceName });
+      res.status(200).send({ data1: updatedServiceName });
+      return;
     }
     const bedId = serviceCharges[0].serviceDetails.map((items) =>
-      items?.bedId.toString()
+      items?.serviceId?.toString()
     );
-  } catch (error) {}
+    console.log("bed Id", serviceCharges[0].serviceDetails);
+    const filteredData = serviceName.filter((items) => {
+      const itemId = items?._id.toString();
+      const isIncluded = bedId.includes(itemId);
+      // console.log(`Checking if bedId array includes ${itemId}:`, isIncluded);
+      return !isIncluded;
+    });
+
+    const updatedData = [
+      ...serviceCharges[0].serviceDetails,
+      ...filteredData.map((item) => ({
+        serviceId: item?._id.toString(),
+        serviceName: item?.serviceName,
+        charges: 0,
+        statue: false,
+      })),
+    ];
+    res.status(200).send({ data: updatedData });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
 });
 
 export default router;

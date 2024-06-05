@@ -83,7 +83,7 @@ router.get("/ipdwardcharges", async (req, res) => {
       res.status(200).send({ data: transformedData });
     } else {
       const bedId = ipdWardCharges[0].bedDetails.map((items) =>
-        items?.bedId.toString()
+        items?.bedId?.toString()
       );
 
       const filteredData = ipdBed.filter((items) => {

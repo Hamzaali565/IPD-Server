@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const ServiceCharges = new mongoose.Schema({
-  parentId: { type: mongoose.ObjectId, required: true },
   parentName: { type: String, required: true },
   wardName: { type: String, required: true },
   party: { type: String, required: true },
