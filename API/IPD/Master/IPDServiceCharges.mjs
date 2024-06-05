@@ -104,7 +104,7 @@ router.get("/servicecharges", async (req, res) => {
         statue: false,
       })),
     ];
-    res.status(200).send({ data: updatedData });
+    res.status(200).send({ data: updatedData, _id: serviceCharges[0]._id });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
