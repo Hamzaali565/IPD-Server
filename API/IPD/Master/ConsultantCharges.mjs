@@ -59,7 +59,7 @@ router.get("/consultantcharges", async (req, res) => {
     const arrangedNames = consultantName.map((item) => ({
       name: item?.name,
       charges: 0,
-      statue: false,
+      status: false,
       consultantId: item?._id,
     }));
     if (consultantCharges.length <= 0) {
