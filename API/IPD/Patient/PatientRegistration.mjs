@@ -117,4 +117,19 @@ router.post("/patientreg", async (req, res) => {
   }
 });
 
+router.get("/patientreg", async (req, res) => {
+  try {
+    const { MrNo } = req.query;
+
+    if (!MrNo) throw new Error("MR No. IS REQUIRED!!!");
+
+    const findData = await PatientRegModel.find({ MrNo });
+    if (findData.length <= 0) throw new Error("NO DATA FOUND!!!");
+    res.status(200).send({ data: findData });
+    return;
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 export default router;
