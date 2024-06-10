@@ -70,7 +70,6 @@ router.get("/consultantcharges", async (req, res) => {
     const consultantChargesID = consultantCharges[0].consultantDetails.map(
       (items) => items?.consultantId?.toString()
     );
-
     const filteredData = consultantName.filter((item) => {
       const itemId = item?._id?.toString();
       const isInclude = consultantChargesID.includes(itemId);
