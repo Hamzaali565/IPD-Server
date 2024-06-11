@@ -117,6 +117,71 @@ router.post("/patientreg", async (req, res) => {
   }
 });
 
+router.put("/patientreg", async (req, res) => {
+  try {
+    const {
+      MrNo,
+      patientType,
+      patientName,
+      ageYear,
+      ageDay,
+      ageMonth,
+      relativeType,
+      gender,
+      occupation,
+      maritalStatus,
+      email,
+      cellNo,
+      cnicNo,
+      address,
+      kinName,
+      kinRelation,
+      kinCell,
+      kinCnic,
+      kinAddress,
+      kinOccupation,
+      relativeName,
+      updatedUser,
+    } = req.body;
+    console.log("req.body", maritalStatus);
+    const response = await PatientRegModel.find({ MrNo });
+    if (response.length <= 0)
+      throw new Error("NO DATA FOUND AGAINST THIS MR NO. !!!");
+    const updateMr = await PatientRegModel.findOneAndUpdate(
+      { MrNo: MrNo },
+      {
+        $set: {
+          patientType,
+          patientName,
+          ageYear,
+          ageDay,
+          ageMonth,
+          relativeType,
+          gender,
+          occupation,
+          maritalStatus,
+          email,
+          cellNo,
+          cnicNo,
+          address,
+          kinName,
+          kinRelation,
+          kinCell,
+          kinCnic,
+          kinAddress,
+          kinOccupation,
+          relativeName,
+          updatedUser,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).send({ data: updateMr });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 router.get("/patientreg", async (req, res) => {
   try {
     const { MrNo } = req.query;
