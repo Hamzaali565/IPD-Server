@@ -1,6 +1,7 @@
 import express from "express";
 import { ReservationModel } from "../../../DBRepo/IPD/PatientModel/ReservationModel.mjs";
-import moment from "moment";
+import moment from "moment-timezone";
+import { ShiftModel } from "../../../DBRepo/IPD/Shift/ShiftModel.mjs";
 
 const router = express.Router();
 
@@ -8,17 +9,19 @@ router.post("/reservation", async (req, res) => {
   try {
     const {
       mrNo,
-      fromdate,
+      fromDate,
       toDate,
       consultantId,
       shiftNo,
       amount,
       createdUser,
+      shiftId,
     } = req.body;
+    console.log("Body", req.body);
     if (
       ![
         mrNo,
-        fromdate,
+        fromDate,
         toDate,
         consultantId,
         shiftNo,
@@ -27,9 +30,12 @@ router.post("/reservation", async (req, res) => {
       ].every(Boolean)
     )
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
+    const shiftCheck = await ShiftModel.find({ _id: shiftId });
+    if (shiftCheck[0].status === false)
+      throw new Error(`SHIFT HAS BEEN CLOSED AT ${shiftCheck[0].endedOn}`);
     const response = await ReservationModel.create({
       mrNo,
-      fromdate,
+      fromDate,
       toDate,
       consultantId,
       shiftNo,
@@ -37,7 +43,7 @@ router.post("/reservation", async (req, res) => {
       createdUser,
       createdOn: moment(new Date())
         .tz("Asia/Karachi")
-        .format("YYYY-MM-DD HH:mm:ss"),
+        .format("DD/MM/YYYY HH:mm:ss"),
     });
     res.status(200).send({ data: response });
   } catch (error) {

@@ -26,6 +26,7 @@ const patientRegSchema = new mongoose.Schema({
   kinAddress: { type: String },
   kinOccupation: { type: String },
   updatedUser: { type: String, required: true },
+  updatedOn: { type: String, required: true },
 });
 
 // Apply the auto-increment plugin to the schema

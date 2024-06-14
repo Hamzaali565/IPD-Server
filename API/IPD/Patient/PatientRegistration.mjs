@@ -1,6 +1,7 @@
 import express from "express";
 import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 const router = express.Router();
+import moment from "moment-timezone";
 
 router.post("/patientreg", async (req, res) => {
   try {
@@ -172,6 +173,9 @@ router.put("/patientreg", async (req, res) => {
           kinOccupation,
           relativeName,
           updatedUser,
+          updatedOn: `${moment(new Date())
+            .tz("Asia/Karachi")
+            .format("YYYY/MM/DD HH:mm:ss")}`,
         },
       },
       { new: true }
