@@ -197,4 +197,14 @@ router.get("/patientreg", async (req, res) => {
   }
 });
 
+router.get("/patientData", async (req, res) => {
+  try {
+    const response = await PatientRegModel.find({});
+    if (response.length <= 0) throw new Error("NO DATA ENTERED YET!!!");
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 export default router;
