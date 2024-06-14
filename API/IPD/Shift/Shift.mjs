@@ -1,9 +1,10 @@
 import express from "express";
 import { ShiftModel } from "../../../DBRepo/IPD/Shift/ShiftModel.mjs";
-import moment from "moment";
+import moment from "moment-timezone";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
-
+const SECRET = process.env.SECRET || "topsecret";
 router.post("/shift", async (req, res) => {
   try {
     const { userName, userId } = req.body;
@@ -17,7 +18,7 @@ router.post("/shift", async (req, res) => {
       status: true,
       createdOn: `${moment(new Date())
         .tz("Asia/Karachi")
-        .format("YYYY-MM-DD HH:mm:ss")}`,
+        .format("YYYY/MM/DD HH:mm:ss")}`,
     });
     res.status(200).send({ data: response });
   } catch (error) {
@@ -38,11 +39,24 @@ router.put("/shift", async (req, res) => {
           status: false,
           endedOn: `${moment(new Date())
             .tz("Asia/Karachi")
-            .format("YYYY-MM-DD HH:mm:ss")}`,
+            .format("YYYY/MM/DD HH:mm:ss")}`,
         },
       },
       { new: true }
     );
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/shift", async (req, res) => {
+  try {
+    const token = req.cookies.Token;
+    const decoded = jwt.verify(token, SECRET);
+    const userId = decoded.userId;
+    console.log("User iD:", userId);
+    const response = await ShiftModel.find({ userId, status: true });
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
