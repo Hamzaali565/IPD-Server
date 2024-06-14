@@ -79,6 +79,9 @@ router.post("/patientreg", async (req, res) => {
               kinOccupation,
               relativeName,
               updatedUser,
+              updatedOn: `${moment(new Date())
+                .tz("Asia/Karachi")
+                .format("YYYY/MM/DD HH:mm:ss")}`,
             },
           },
           { new: true }
@@ -109,6 +112,9 @@ router.post("/patientreg", async (req, res) => {
       kinOccupation,
       relativeName,
       updatedUser,
+      updatedOn: `${moment(new Date())
+        .tz("Asia/Karachi")
+        .format("YYYY/MM/DD HH:mm:ss")}`,
     });
 
     res.status(200).send({ data: createData });
