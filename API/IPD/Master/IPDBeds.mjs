@@ -51,4 +51,19 @@ router.get("/ipdward", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
+router.get("/ipdadmissionbed", async (req, res) => {
+  try {
+    const { wardName } = req.query;
+    const response = await IPDBedModel.find({ wardName, reserved: false });
+    const updatedData = response.map((item) => ({
+      name: item.bedNumber,
+      _id: item._id,
+    }));
+    updatedData.unshift({ name: "--" });
+    res.status(200).send({ data: updatedData });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
 export default router;

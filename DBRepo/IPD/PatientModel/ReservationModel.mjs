@@ -11,6 +11,7 @@ const reservation = new mongoose.Schema({
   consultantId: { type: mongoose.ObjectId, required: true },
   shiftNo: { type: String, required: true },
   amount: { type: String, required: true },
+  AdmissionStatus: { type: Boolean, default: false },
   createdUser: { type: String, required: true },
   createdOn: { type: String, required: true },
   updatedUser: { type: String },
