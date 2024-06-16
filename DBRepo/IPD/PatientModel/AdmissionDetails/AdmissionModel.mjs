@@ -17,6 +17,7 @@ const admissionSchema = new mongoose.Schema({
   dischargeSummary: { type: Boolean, default: false },
   discharge: { type: Boolean, default: false },
   billingLock: { type: Boolean, default: false },
+  reservationNo: { type: String },
 });
 
 admissionSchema.plugin(AutoIncrement, { inc_field: "admissionNo" });

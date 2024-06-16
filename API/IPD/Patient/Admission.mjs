@@ -9,6 +9,7 @@ import {
 } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 import { AdmissionWardChargesModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/wardChargesModel.mjs";
 import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
+import { ReservationModel } from "../../../DBRepo/IPD/PatientModel/ReservationModel.mjs";
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ router.post("/admission", async (req, res) => {
       bedNo,
       bedId,
       consultantId,
+      reservationNo,
     } = req.body;
 
     if (
@@ -44,7 +46,7 @@ router.post("/admission", async (req, res) => {
     const findActiveBeds = await IPDWardChargesModel.find({ wardName, party });
     if (findActiveBeds.length < 0)
       throw new Error(
-        "THIS WARD IS NOT ACTIVE ON THIS PARTY PLEASE CONTACT TO YOUR IT DEPARTMENT"
+        "THIS WARD IS NOT ACTIVE ON THIS PARTY KINDLY CONTACT TO YOUR IT TEAM !!!"
       );
 
     const filteredData = findActiveBeds[0].bedDetails.filter((items) => {
@@ -54,7 +56,7 @@ router.post("/admission", async (req, res) => {
     console.log("filteredData", filteredData[0].bedCharges);
     if (filteredData[0].status === false)
       throw new Error(
-        "BED IS NOT ACTIVATED ON THIS PARTY PLAEASE CONTACT TO YOUR IT DEPARTMENT !!!"
+        "BED IS NOT ACTIVATED ON THIS PARTY KINDLY CONTACT TO YOUR IT TEAM !!!"
       );
 
     const admissionC = await AdmissionModel.create({
@@ -66,6 +68,7 @@ router.post("/admission", async (req, res) => {
         .format("DD/MM/YYYY HH:mm:ss"),
       remarks,
       referedBy,
+      reservationNo,
     });
     if (admissionC.length < 0) {
       throw new Error("PLEASE TRY LATER!!!");
@@ -130,6 +133,18 @@ router.post("/admission", async (req, res) => {
       },
       { new: true }
     );
+
+    if (reservationNo !== "") {
+      const reservation = await ReservationModel.findOneAndUpdate(
+        { reservationNo: reservationNo },
+        {
+          $set: {
+            AdmissionStatus: true,
+          },
+        },
+        { new: true }
+      );
+    }
 
     res
       .status(200)
