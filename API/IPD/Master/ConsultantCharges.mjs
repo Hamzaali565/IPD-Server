@@ -98,7 +98,6 @@ router.get("/consultantcharges", async (req, res) => {
 router.get("/admissionconsultant", async (req, res) => {
   try {
     const { admissionNo, consultantId } = req.query;
-    console.log("consultantId", consultantId);
     if (![admissionNo, consultantId].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
 
