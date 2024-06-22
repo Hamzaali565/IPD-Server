@@ -10,6 +10,7 @@ import {
 import { AdmissionWardChargesModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/wardChargesModel.mjs";
 import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
 import { ReservationModel } from "../../../DBRepo/IPD/PatientModel/ReservationModel.mjs";
+import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 
 const router = express.Router();
 
@@ -158,6 +159,43 @@ router.post("/admission", async (req, res) => {
     res
       .status(200)
       .send({ data: [admissionC, PartyC, wardC, consultantC, wardChargesC] });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/admission", async (req, res) => {
+  try {
+    const response = await AdmissionModel.find({ discharge: false });
+    const mrNos = response.map((item) => item.mrNo);
+    const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+      };
+      return acc;
+    }, {});
+
+    // Step 4: Add patientName to the original response
+    const updatedResponse = response.map((item) => ({
+      _id: item._id,
+      mrNo: item.mrNo,
+      admissionNo: item.admissionNo,
+      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+    }));
+    res.status(200).send({ data: updatedResponse });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }

@@ -8,6 +8,7 @@ import MRReg from "../../API/IPD/Patient/PatientRegistration.mjs";
 import Reservation from "../../API/IPD/Patient/Reservation.mjs";
 import Shift from "../../API/IPD/Shift/Shift.mjs";
 import Admission from "../../API/IPD/Patient/Admission.mjs";
+import ConsultantVisit from "../../API/IPD/OtherTransactions/ConsultantVisit.mjs";
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use(MRReg);
 router.use(Reservation);
 router.use(Shift);
 router.use(Admission);
+router.use(ConsultantVisit);
 
 export default router;
