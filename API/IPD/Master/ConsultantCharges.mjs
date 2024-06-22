@@ -2,6 +2,10 @@ import express, { response } from "express";
 import { ConsultantChargesModel } from "../../../DBRepo/IPD/Masters/ConsultantChargesModel.mjs";
 import moment from "moment";
 import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
+import {
+  AdmissionPartyModel,
+  AdmissionWardModel,
+} from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 
 const router = express.Router();
 
@@ -86,6 +90,40 @@ router.get("/consultantcharges", async (req, res) => {
     ];
     res.status(200).send({ data: updatedData });
     return;
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/admissionconsultant", async (req, res) => {
+  try {
+    const { admissionNo, consultantId } = req.query;
+    console.log("consultantId", consultantId);
+    if (![admissionNo, consultantId].every(Boolean))
+      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+
+    const party = await AdmissionPartyModel.find(
+      { admissionNo, activeOnAdmission: true },
+      "party"
+    );
+
+    const wardName = await AdmissionWardModel.find(
+      { admissionNo, activeOnAdmission: true },
+      "wardName"
+    );
+
+    const findBed = await ConsultantChargesModel.find(
+      { wardName: wardName[0].wardName, party: party[0].party },
+      "consultantDetails"
+    );
+    if (findBed.length <= 0)
+      throw new Error(
+        "RATES OF BEDS ARE NOT ACTIVATED KINDLY CONTACT TO YOUR I.T DEPARTMENT!!!"
+      );
+    const consultantCharges = findBed[0].consultantDetails.filter(
+      (item) => item.consultantId.toString() == consultantId.toString()
+    );
+    res.status(200).send({ data: consultantCharges });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }

@@ -2,7 +2,6 @@ import express from "express";
 import { IPDWardChargesModel } from "../../../DBRepo/IPD/Masters/WardChargesIPDModel.mjs";
 import moment from "moment";
 import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
-import mongoose from "mongoose";
 
 const router = express.Router();
 
