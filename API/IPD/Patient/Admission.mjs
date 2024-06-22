@@ -59,6 +59,15 @@ router.post("/admission", async (req, res) => {
         "BED IS NOT ACTIVATED ON THIS PARTY KINDLY CONTACT TO YOUR IT TEAM !!!"
       );
 
+    const mrAdmittedCheck = await AdmissionWardModel.find({
+      mrNo,
+      activeOnAdmission: true,
+    });
+    if (mrAdmittedCheck.length > 0)
+      throw new Error(
+        `THIS PATIENT IS ALREADY ADMITTED IN ${mrAdmittedCheck[0]?.wardName} ON BED NO. ${mrAdmittedCheck[0]?.bedNo}`
+      );
+
     const admissionC = await AdmissionModel.create({
       admissionType,
       mrNo,
