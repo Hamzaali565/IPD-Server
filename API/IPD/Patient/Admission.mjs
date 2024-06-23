@@ -201,4 +201,57 @@ router.get("/admission", async (req, res) => {
   }
 });
 
+router.get("/admissionbed", async (req, res) => {
+  try {
+    const { wardName } = req.query;
+    if (!wardName) throw new Error("WARDNAME IS REQUIRED !!!");
+
+    const reservedBeds = await IPDBedModel.find({ wardName, reserved: true });
+    if (reservedBeds.length <= 0)
+      throw new Error("NO PATIENT IN THIS WARD !!!");
+
+    const idSet2 = reservedBeds.map((items) => items._id.toString());
+    const response2 = await AdmissionWardModel.find({
+      bedId: { $in: idSet2 },
+    });
+    const response = response2.filter(
+      (items) => items?.activeOnAdmission !== false
+    );
+
+    const mrNos = response.map((item) => item.mrNo);
+    const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+      };
+      return acc;
+    }, {});
+
+    // Step 4: Add patientName to the original response
+    const updatedResponse = response.map((item) => ({
+      _id: item._id,
+      mrNo: item.mrNo,
+      admissionNo: item.admissionNo,
+      bedNo: item?.bedNo,
+      wardName: item?.wardName,
+      bedId: item?.bedId,
+      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+    }));
+    res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
 export default router;

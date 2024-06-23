@@ -85,6 +85,8 @@ router.get("/ipdwardcharges", async (req, res) => {
         items?.bedId?.toString()
       );
 
+      console.log("bedId", bedId);
+
       const filteredData = ipdBed.filter((items) => {
         const itemId = items?._id.toString();
         const isIncluded = bedId.includes(itemId);
