@@ -10,6 +10,8 @@ import Shift from "../../API/IPD/Shift/Shift.mjs";
 import Admission from "../../API/IPD/Patient/Admission.mjs";
 import ConsultantVisit from "../../API/IPD/OtherTransactions/ConsultantVisit.mjs";
 import WardCharges from "../../API/IPD/OtherTransactions/WardCharges.mjs";
+import ProcedureCharges from "../../API/IPD/OtherTransactions/ProcedureCharges.mjs";
+
 const router = express.Router();
 
 router.use(IPDWardCharges);
@@ -23,5 +25,6 @@ router.use(Shift);
 router.use(Admission);
 router.use(ConsultantVisit);
 router.use(WardCharges);
+router.use(ProcedureCharges);
 
 export default router;
