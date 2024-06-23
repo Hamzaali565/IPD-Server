@@ -6,12 +6,13 @@ const consultantVisitSchema = new mongoose.Schema({
   consultantId: { type: mongoose.ObjectId, required: true },
   consultantName: { type: String, required: true },
   visitDate: { type: String, required: true },
-  remarks: { type: String },
+  charges: { type: Number, required: true },
+  remarks: { type: String, default: "" },
   isDeleted: { type: Boolean, default: false },
   createdUser: { type: String, required: true },
   createdOn: { type: String, required: true },
-  deletedUser: { type: String },
-  deletedOn: { type: String },
+  deletedUser: { type: String, default: "" },
+  deletedOn: { type: String, default: "" },
 });
 
 export const ConsultantVisitModel = mongoose.model(

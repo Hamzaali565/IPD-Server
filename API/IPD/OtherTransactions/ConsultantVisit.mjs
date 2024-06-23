@@ -12,10 +12,10 @@ router.post("/consultantvisit", async (req, res) => {
       consultantName,
       visitDate,
       remarks,
+      charges,
       createdUser,
-      createdOn,
     } = req.body;
-
+    console.log("body", req.body);
     if (
       ![
         admissionNo,
@@ -24,6 +24,7 @@ router.post("/consultantvisit", async (req, res) => {
         consultantName,
         visitDate,
         createdUser,
+        charges,
       ].every(Boolean)
     )
       throw new Error("ALL PARAMETERS ARE REEQUIRED!!!");
@@ -32,8 +33,9 @@ router.post("/consultantvisit", async (req, res) => {
       mrNo,
       consultantId,
       consultantName,
-      visitDate,
+      visitDate: moment(visitDate).format("DD/MM/YYYY"),
       remarks,
+      charges,
       createdUser,
       createdOn: moment(new Date())
         .tz("Asia/Karachi")
@@ -47,11 +49,12 @@ router.post("/consultantvisit", async (req, res) => {
 
 router.put("/consultantvisit", async (req, res) => {
   try {
-    const { isDeleted, admissionNo, deletedUser } = req.body;
-    if ((!isDeleted, admissionNo, deletedUser))
+    const { isDeleted, admissionNo, deletedUser, _id } = req.body;
+    console.log("body ", req.body);
+    if (![isDeleted, admissionNo, deletedUser, _id].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
     const response = await ConsultantVisitModel.findOneAndUpdate(
-      { admissionNo },
+      { admissionNo, _id },
       {
         $set: {
           isDeleted,
@@ -63,6 +66,7 @@ router.put("/consultantvisit", async (req, res) => {
       },
       { new: true }
     );
+    if (response === null) throw new Error("NO DATA DELETED!!");
     res
       .status(200)
       .send({ data: "CONSULTANT DELETED SUCCESSFULLY!!!", datas: response });
@@ -75,7 +79,11 @@ router.get("/consultantvisit", async (req, res) => {
   try {
     const { admissionNo } = req.query;
     if (!admissionNo) throw new Error("ADMISSION NO. IS REQUIRED!!!");
-    const response = await ConsultantVisitModel.find({ admissionNo });
+    const response = await ConsultantVisitModel.find({
+      admissionNo,
+      isDeleted: false,
+    });
+    if (response.length <= 0) throw new Error("NO DATA FOUND !!!");
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
