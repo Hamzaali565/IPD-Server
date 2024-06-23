@@ -66,7 +66,7 @@ router.put("/consultantvisit", async (req, res) => {
       },
       { new: true }
     );
-    if (response === null) throw new Error("NO DATA DELETED!!");
+    if (response <= 0) throw new Error("NO DATA DELETED!!");
     res
       .status(200)
       .send({ data: "CONSULTANT DELETED SUCCESSFULLY!!!", datas: response });
