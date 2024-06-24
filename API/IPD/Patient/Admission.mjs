@@ -60,13 +60,13 @@ router.post("/admission", async (req, res) => {
         "BED IS NOT ACTIVATED ON THIS PARTY KINDLY CONTACT TO YOUR IT TEAM !!!"
       );
 
-    const mrAdmittedCheck = await AdmissionWardModel.find({
+    const mrAdmittedCheck = await IPDBedModel.find({
       mrNo,
-      activeOnAdmission: true,
+      reserved: true,
     });
     if (mrAdmittedCheck.length > 0)
       throw new Error(
-        `THIS PATIENT IS ALREADY ADMITTED IN ${mrAdmittedCheck[0]?.wardName} ON BED NO. ${mrAdmittedCheck[0]?.bedNo}`
+        `THIS PATIENT IS ALREADY ADMITTED IN ${mrAdmittedCheck[0]?.wardName} ON BED NO. ${mrAdmittedCheck[0]?.bedNumber}`
       );
 
     const admissionC = await AdmissionModel.create({
@@ -139,6 +139,8 @@ router.post("/admission", async (req, res) => {
       {
         $set: {
           reserved: true,
+          admissionNo: admNo,
+          mrNo,
         },
       },
       { new: true }
@@ -206,17 +208,10 @@ router.get("/admissionbed", async (req, res) => {
     const { wardName } = req.query;
     if (!wardName) throw new Error("WARDNAME IS REQUIRED !!!");
 
-    const reservedBeds = await IPDBedModel.find({ wardName, reserved: true });
-    if (reservedBeds.length <= 0)
-      throw new Error("NO PATIENT IN THIS WARD !!!");
+    const response = await IPDBedModel.find({ wardName });
+    if (response.length <= 0) throw new Error("NO PATIENT IN THIS WARD !!!");
 
-    const idSet2 = reservedBeds.map((items) => items._id.toString());
-    const response2 = await AdmissionWardModel.find({
-      bedId: { $in: idSet2 },
-    });
-    const response = response2.filter(
-      (items) => items?.activeOnAdmission !== false
-    );
+    const idSet2 = response.map((items) => items._id.toString());
 
     const mrNos = response.map((item) => item.mrNo);
     const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
@@ -238,7 +233,7 @@ router.get("/admissionbed", async (req, res) => {
       _id: item._id,
       mrNo: item.mrNo,
       admissionNo: item.admissionNo,
-      bedNo: item?.bedNo,
+      bedNo: item?.bedNumber,
       wardName: item?.wardName,
       bedId: item?.bedId,
       patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
