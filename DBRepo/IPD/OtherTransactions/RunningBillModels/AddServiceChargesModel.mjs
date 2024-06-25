@@ -7,6 +7,7 @@ const AddServiceCharges = new mongoose.Schema({
   admissionNo: { type: String, required: true },
   mrNo: { type: String, required: true },
   serviceNo: { type: Number, unique: true },
+  createdOn: { type: String, required: true },
   serviceDetails: [
     {
       sreviceName: { type: String },
@@ -14,7 +15,6 @@ const AddServiceCharges = new mongoose.Schema({
       isdeleted: { type: Boolean, default: false },
       charge: { type: Number },
       createdUser: { type: String },
-      createdOn: { type: String },
       deletedUser: { type: String },
       deletedOn: { type: String },
     },
