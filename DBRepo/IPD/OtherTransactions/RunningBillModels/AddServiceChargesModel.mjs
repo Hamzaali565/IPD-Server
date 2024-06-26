@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
+
 import AutoIncrementFactory from "mongoose-sequence";
 
 const AutoIncrement = AutoIncrementFactory(mongoose.connection);
@@ -10,10 +12,12 @@ const AddServiceCharges = new mongoose.Schema({
   createdOn: { type: String, required: true },
   serviceDetails: [
     {
-      sreviceName: { type: String },
+      serviceName: { type: String },
       serviceId: { type: mongoose.ObjectId },
+      uniqueServiceId: { type: String, default: uuidv4 },
       isdeleted: { type: Boolean, default: false },
-      charge: { type: Number },
+      charges: { type: Number },
+      amount: { type: Number },
       createdUser: { type: String },
       deletedUser: { type: String },
       deletedOn: { type: String },

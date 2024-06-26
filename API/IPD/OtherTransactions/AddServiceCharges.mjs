@@ -4,12 +4,16 @@ import moment from "moment-timezone";
 import { AdmissionPartyModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
 import { serviceChargesModel } from "../../../DBRepo/IPD/Masters/IPDServiceChargesModel.mjs";
+import { AdmissionModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/AdmissionModel.mjs";
 
 const router = express.Router();
 
 router.post("/internalservice", async (req, res) => {
   try {
-    const { admissionNo, mrNo, serviceDetails } = req.body;
+    const { admissionNo, serviceDetails } = req.body;
+
+    const mrInfo = await AdmissionModel.find({ admissionNo });
+    const mrNo = mrInfo[0]?.mrNo;
 
     if (![admissionNo, mrNo, serviceDetails].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
@@ -33,11 +37,17 @@ router.put("/internalservice", async (req, res) => {
     const { _id, deletedUser } = req.body;
     if (!_id || !deletedUser) throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
 
+    const response2 = await AddServiceChargesModel.find({
+      "serviceDetails.uniqueServiceId": _id,
+    });
+    console.log("====================================");
+    console.log(response2);
+    console.log("====================================");
     const response = await AddServiceChargesModel.updateOne(
-      { "serviceDetails._id": _id },
+      { "serviceDetails.uniqueServiceId": _id },
       {
         $set: {
-          "serviceDetails.$.isDeleted": true,
+          "serviceDetails.$.isdeleted": true,
           "serviceDetails.$.deletedUser": deletedUser,
           "serviceDetails.$.deletedOn": moment(new Date())
             .tz("Asia/Karachi")
@@ -56,13 +66,15 @@ router.get("/internalservice", async (req, res) => {
     const { admissionNo } = req.query;
     if (!admissionNo) throw new Error("ADMISSION NO. IS REQUIRED!!!");
     const response = await AddServiceChargesModel.find(
-      { admissionNo, "serviceDetails.isDeleted": false },
+      { admissionNo },
       "serviceDetails"
     );
     if (response.length <= 0)
       throw new Error("NO SERVICES ADDED TO THIS PATIENT!!!");
     // const filterData = response[0].
-    res.status(200).send({ response });
+    const flatData = response.flatMap((item) => item?.serviceDetails);
+    const filterData = flatData.filter((item) => item?.isdeleted !== true);
+    res.status(200).send({ data: filterData });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
