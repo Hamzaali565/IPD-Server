@@ -44,6 +44,11 @@ router.post("/admission", async (req, res) => {
     )
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
 
+    const findBed = await IPDBedModel.find({ _id: bedId });
+    console.log("findBed", findBed);
+    if (findBed[0]?.reserved === true)
+      throw new Error("THIS  BED IS ALREADY RESERVED!!!");
+
     const findActiveBeds = await IPDWardChargesModel.find({ wardName, party });
     if (findActiveBeds.length < 0)
       throw new Error(

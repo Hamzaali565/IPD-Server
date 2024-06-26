@@ -12,6 +12,7 @@ import ConsultantVisit from "../../API/IPD/OtherTransactions/ConsultantVisit.mjs
 import WardCharges from "../../API/IPD/OtherTransactions/WardCharges.mjs";
 import ProcedureCharges from "../../API/IPD/OtherTransactions/ProcedureCharges.mjs";
 import AddServiceCharges from "../../API/IPD/OtherTransactions/AddServiceCharges.mjs";
+import RoomTransfer from "../../API/IPD/OtherTransactions/WardTransfer.mjs";
 
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.use(ConsultantVisit);
 router.use(WardCharges);
 router.use(ProcedureCharges);
 router.use(AddServiceCharges);
+router.use(RoomTransfer);
 
 export default router;

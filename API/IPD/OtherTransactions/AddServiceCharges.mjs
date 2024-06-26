@@ -37,12 +37,6 @@ router.put("/internalservice", async (req, res) => {
     const { _id, deletedUser } = req.body;
     if (!_id || !deletedUser) throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
 
-    const response2 = await AddServiceChargesModel.find({
-      "serviceDetails.uniqueServiceId": _id,
-    });
-    console.log("====================================");
-    console.log(response2);
-    console.log("====================================");
     const response = await AddServiceChargesModel.updateOne(
       { "serviceDetails.uniqueServiceId": _id },
       {
