@@ -5,17 +5,19 @@ import AutoIncrementFactory from "mongoose-sequence";
 const AutoIncrement = AutoIncrementFactory(mongoose.connection);
 
 const paymentReciept = new mongoose.Schema({
-  paymentType: { type: String, required: true },
-  location: { type: String, required: true },
-  paymentAgainst: { type: String, required: true },
+  paymentType: { type: String, required: true }, //ok
+  location: { type: String, required: true }, //ok
+  paymentAgainst: { type: String, required: true }, //ok
   paymentNo: { type: Number, unique: true },
-  amount: { type: Number, required: true },
-  shiftNo: { type: String, required: true },
-  againstNo: { type: String, required: true },
-  mrNo: { type: String, required: true },
-  remarks: { type: String },
-  createdUser: { type: String, required: true },
+  amount: { type: Number, required: true }, //ok
+  shiftNo: { type: String, required: true }, //ok
+  againstNo: { type: String, required: true }, //ok
+  mrNo: { type: String, required: true }, ///ok
+  remarks: { type: String }, //ok
+  createdUser: { type: String, required: true }, //ok
   createdOn: { type: String, required: true },
+  idDelete: { type: Boolean },
+  deleTedOn: { type: String },
 });
 
 paymentReciept.plugin(AutoIncrement, { inc_field: "paymentNo" });

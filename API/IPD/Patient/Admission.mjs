@@ -162,7 +162,6 @@ router.post("/admission", async (req, res) => {
         { new: true }
       );
     }
-
     res
       .status(200)
       .send({ data: [admissionC, PartyC, wardC, consultantC, wardChargesC] });
