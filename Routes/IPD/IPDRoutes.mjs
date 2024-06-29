@@ -13,6 +13,7 @@ import WardCharges from "../../API/IPD/OtherTransactions/WardCharges.mjs";
 import ProcedureCharges from "../../API/IPD/OtherTransactions/ProcedureCharges.mjs";
 import AddServiceCharges from "../../API/IPD/OtherTransactions/AddServiceCharges.mjs";
 import RoomTransfer from "../../API/IPD/OtherTransactions/WardTransfer.mjs";
+import PaymentReciept from "../../API/IPD/Payment/PaymentReciept.mjs";
 
 const router = express.Router();
 
@@ -30,5 +31,6 @@ router.use(WardCharges);
 router.use(ProcedureCharges);
 router.use(AddServiceCharges);
 router.use(RoomTransfer);
+router.use(PaymentReciept);
 
 export default router;
