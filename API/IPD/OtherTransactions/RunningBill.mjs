@@ -3,6 +3,7 @@ import { AddServiceChargesModel } from "../../../DBRepo/IPD/OtherTransactions/Ru
 import { ConsultantVisitModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/ConsultantVisitModel.mjs";
 import { ProcedureChargesModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/ProcedureChargesModel.mjs";
 import { AdmissionWardChargesModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/wardChargesModel.mjs";
+import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
 
 const router = express.Router();
 
@@ -39,16 +40,22 @@ router.get("/runningbill", async (req, res) => {
       isDeleted: false,
     });
 
-    res
-      .status(200)
-      .send({
-        data: {
-          serviceCharges,
-          consultantVisit,
-          procedureCharges,
-          wardCharges,
-        },
-      });
+    // Deposit Details
+    const depositDetails = await PaymentRecieptModel.find({
+      paymentAgainst: "Advance Admission",
+      againstNo: admissionNo,
+      isDelete: false,
+    });
+
+    res.status(200).send({
+      data: {
+        serviceCharges,
+        consultantVisit,
+        procedureCharges,
+        wardCharges,
+        depositDetails: depositDetails.length <= 0 ? 0 : depositDetails,
+      },
+    });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }

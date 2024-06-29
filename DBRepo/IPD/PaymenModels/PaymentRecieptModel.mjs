@@ -16,7 +16,7 @@ const paymentReciept = new mongoose.Schema({
   remarks: { type: String }, //ok
   createdUser: { type: String, required: true }, //ok
   createdOn: { type: String, required: true },
-  idDelete: { type: Boolean },
+  isDelete: { type: Boolean },
   deleTedOn: { type: String },
 });
 
