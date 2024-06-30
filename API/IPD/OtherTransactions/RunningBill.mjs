@@ -4,13 +4,31 @@ import { ConsultantVisitModel } from "../../../DBRepo/IPD/OtherTransactions/Runn
 import { ProcedureChargesModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/ProcedureChargesModel.mjs";
 import { AdmissionWardChargesModel } from "../../../DBRepo/IPD/OtherTransactions/RunningBillModels/wardChargesModel.mjs";
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
+import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
+import {
+  AdmissionPartyModel,
+  AdmissionWardModel,
+} from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 
 const router = express.Router();
 
 router.get("/runningbill", async (req, res) => {
   try {
-    const { admissionNo } = req.query;
-    if (!admissionNo) throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+    const { admissionNo, mrNo } = req.query;
+    if (!admissionNo || !mrNo)
+      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+    const patientData = await PatientRegModel.find({ MrNo: mrNo });
+
+    const activeParty = await AdmissionPartyModel.find({
+      admissionNo,
+      activeOnAdmission: true,
+    });
+
+    const activeWard = await AdmissionWardModel.find({
+      admissionNo,
+      activeOnAdmission: true,
+    });
+
     // service Details
     const serviceChargesData = await AddServiceChargesModel.find({
       admissionNo,
@@ -49,11 +67,14 @@ router.get("/runningbill", async (req, res) => {
 
     res.status(200).send({
       data: {
+        patientData,
+        activeParty,
+        activeWard,
         serviceCharges,
         consultantVisit,
         procedureCharges,
         wardCharges,
-        depositDetails: depositDetails.length <= 0 ? 0 : depositDetails,
+        depositDetails: depositDetails,
       },
     });
   } catch (error) {
