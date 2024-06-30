@@ -9,6 +9,7 @@ import {
   AdmissionPartyModel,
   AdmissionWardModel,
 } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
+import { AdmissionModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/AdmissionModel.mjs";
 
 const router = express.Router();
 
@@ -65,6 +66,8 @@ router.get("/runningbill", async (req, res) => {
       isDelete: false,
     });
 
+    //Admission data
+    const admissionData = await AdmissionModel.find({ admissionNo });
     res.status(200).send({
       data: {
         patientData,
@@ -74,6 +77,7 @@ router.get("/runningbill", async (req, res) => {
         consultantVisit,
         procedureCharges,
         wardCharges,
+        admissionData,
         depositDetails: depositDetails,
       },
     });
