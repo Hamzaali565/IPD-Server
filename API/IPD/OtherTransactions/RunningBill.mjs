@@ -6,10 +6,12 @@ import { AdmissionWardChargesModel } from "../../../DBRepo/IPD/OtherTransactions
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
 import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 import {
+  AdmissionConsultantModel,
   AdmissionPartyModel,
   AdmissionWardModel,
 } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 import { AdmissionModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/AdmissionModel.mjs";
+import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
 
 const router = express.Router();
 
@@ -30,6 +32,13 @@ router.get("/runningbill", async (req, res) => {
       activeOnAdmission: true,
     });
 
+    const activeConsultant = await AdmissionConsultantModel.find({
+      admissionNo,
+      activeOnAdmission: true,
+    });
+    const ConsultantName = await ConsultantsModel.find({
+      _id: activeConsultant[0]?.consultantId,
+    });
     // service Details
     const serviceChargesData = await AddServiceChargesModel.find({
       admissionNo,
@@ -73,6 +82,7 @@ router.get("/runningbill", async (req, res) => {
         patientData,
         activeParty,
         activeWard,
+        ConsultantName,
         serviceCharges,
         consultantVisit,
         procedureCharges,
