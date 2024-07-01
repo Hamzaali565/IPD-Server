@@ -3,6 +3,7 @@ import { ReservationModel } from "../../../DBRepo/IPD/PatientModel/ReservationMo
 import moment from "moment-timezone";
 import { ShiftModel } from "../../../DBRepo/IPD/Shift/ShiftModel.mjs";
 import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
+import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
 
 const router = express.Router();
 
@@ -17,8 +18,10 @@ router.post("/reservation", async (req, res) => {
       amount,
       createdUser,
       shiftId,
+      location,
+      paymentType,
     } = req.body;
-    console.log("Body", req.body);
+
     if (
       ![
         mrNo,
@@ -28,6 +31,8 @@ router.post("/reservation", async (req, res) => {
         shiftNo,
         amount,
         createdUser,
+        location,
+        paymentType,
       ].every(Boolean)
     )
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
@@ -54,7 +59,21 @@ router.post("/reservation", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
-    res.status(200).send({ data: response });
+    console.log("response", response);
+    const response2 = await PaymentRecieptModel.create({
+      againstNo: response?.reservationNo,
+      amount,
+      createdUser,
+      location,
+      mrNo,
+      paymentAgainst: "Against Reservation",
+      paymentType,
+      shiftNo,
+      createdOn: moment(new Date())
+        .tz("Asia/Karachi")
+        .format("DD/MM/YYYY HH:mm:ss"),
+    });
+    res.status(200).send({ data: response2 });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -128,6 +147,15 @@ router.get("/reservation", async (req, res) => {
       gender: mrNoToPatientNameMap[item.mrNo]?.gender,
     }));
     res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.delete("/deleteCollectionReservation", async (req, res) => {
+  try {
+    const response = await ReservationModel.collection.drop();
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }

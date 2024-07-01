@@ -68,15 +68,39 @@ router.get("/runningbill", async (req, res) => {
       isDeleted: false,
     });
 
-    // Deposit Details
-    const depositDetails = await PaymentRecieptModel.find({
-      paymentAgainst: "Advance Admission",
-      againstNo: admissionNo,
-      isDelete: false,
-    });
-
     //Admission data
     const admissionData = await AdmissionModel.find({ admissionNo });
+    // Deposit Details
+    const reservationNo = admissionData[0]?.reservationNo; // Using optional chaining to safely access reservationNo
+
+    let query;
+
+    if (reservationNo) {
+      // If reservationNo exists, search for either admissionNo or reservationNo
+      query = {
+        $or: [
+          {
+            paymentAgainst: "Advance Admission",
+            againstNo: admissionNo,
+            isDelete: false,
+          },
+          {
+            paymentAgainst: "Against Reservation",
+            againstNo: reservationNo,
+            isDelete: false,
+          },
+        ],
+      };
+    } else {
+      // If reservationNo does not exist, search only for admissionNo
+      query = {
+        paymentAgainst: "Advance Admission",
+        againstNo: admissionNo,
+        isDelete: false,
+      };
+    }
+
+    const depositDetails = await PaymentRecieptModel.find(query);
     res.status(200).send({
       data: {
         patientData,
