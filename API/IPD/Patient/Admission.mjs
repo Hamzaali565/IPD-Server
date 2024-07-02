@@ -137,6 +137,7 @@ router.post("/admission", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
       amount: filteredData[0].bedCharges,
+      roomDate: moment(new Date()).tz("Asia/Karachi").format("DD/MM/YYYY"),
     });
 
     const reserveBed = await IPDBedModel.findOneAndUpdate(
