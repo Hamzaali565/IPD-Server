@@ -16,6 +16,7 @@ const admissionSchema = new mongoose.Schema({
   referedBy: { type: String },
   dischargeSummary: { type: Boolean, default: false },
   discharge: { type: Boolean, default: false },
+  dischargeDate: { type: String },
   billingLock: { type: Boolean, default: false },
   reservationNo: { type: String },
 });
