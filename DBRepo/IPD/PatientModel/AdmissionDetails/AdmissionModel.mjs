@@ -18,6 +18,7 @@ const admissionSchema = new mongoose.Schema({
   discgargeSummaryDate: { type: String },
   discharge: { type: Boolean, default: false },
   dischargeDate: { type: String },
+  dischargeUser: { type: String },
   billingLock: { type: Boolean, default: false },
   reservationNo: { type: String },
 });
