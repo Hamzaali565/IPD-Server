@@ -349,9 +349,12 @@ router.get("/admissionbed", async (req, res) => {
 
 router.put("/manyUpdates", async (req, res) => {
   try {
-    const update = await AdmissionModel.updateMany(
-      {},
-      { $set: { billFlag: false } }
+    const dcPatient = await AdmissionModel.find({ discharge: true });
+    const mrdata = dcPatient.map((items) => items.admissionNo);
+    console.log(mrdata);
+    const update = await IPDBedModel.updateMany(
+      { admissionNo: { $in: mrdata } },
+      { $set: { reserved: false } }
     );
 
     res.status(200).send({ data: update });
