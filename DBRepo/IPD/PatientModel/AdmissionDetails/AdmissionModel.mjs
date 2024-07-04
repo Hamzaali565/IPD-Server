@@ -21,8 +21,13 @@ const admissionSchema = new mongoose.Schema({
   dischargeUser: { type: String },
   billingLock: { type: Boolean, default: false },
   reservationNo: { type: String },
+  billNo: { type: Number, unique: true },
+  billDate: { type: String },
+  billUser: { type: String },
+  billFlag: { type: Boolean, default: false },
 });
 
 admissionSchema.plugin(AutoIncrement, { inc_field: "admissionNo" });
+admissionSchema.plugin(AutoIncrement, { inc_field: "billNo" });
 
 export const AdmissionModel = mongoose.model("AdmissionModel", admissionSchema);
