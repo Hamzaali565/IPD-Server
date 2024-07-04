@@ -82,7 +82,7 @@ router.post("/ipddischargeSummary", async (req, res) => {
 
 router.get("/dischargeconsultant", async (req, res) => {
   try {
-    const { admissionNo } = req.query;
+    const { admissionNo, returnTo } = req.query;
     if (!admissionNo) throw new Error("ADMISSOIN NO IS REQUIRED !!!");
     const activeConsultant = await AdmissionConsultantModel.find({
       admissionNo,
@@ -104,6 +104,10 @@ router.get("/dischargeconsultant", async (req, res) => {
       admissionNo,
       activeOnAdmission: true,
     });
+    if (returnTo === "Chalo Bhai") {
+      res.status(200).json({ data: updatedData, data2: ward });
+      return;
+    }
     const admission = await AdmissionModel.find({
       admissionNo,
       dischargeSummary: true,
