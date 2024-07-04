@@ -254,4 +254,5 @@ router.get("/admissionbed", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
 export default router;

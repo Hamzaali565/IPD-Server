@@ -15,6 +15,7 @@ import AddServiceCharges from "../../API/IPD/OtherTransactions/AddServiceCharges
 import RoomTransfer from "../../API/IPD/OtherTransactions/WardTransfer.mjs";
 import PaymentReciept from "../../API/IPD/Payment/PaymentReciept.mjs";
 import RunningBill from "../../API/IPD/OtherTransactions/RunningBill.mjs";
+import DischargeSummary from "../../API/IPD/Discharge/DischargeSummary.mjs";
 
 const router = express.Router();
 
@@ -34,5 +35,6 @@ router.use(AddServiceCharges);
 router.use(RoomTransfer);
 router.use(PaymentReciept);
 router.use(RunningBill);
+router.use(DischargeSummary);
 
 export default router;
