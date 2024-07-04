@@ -183,6 +183,8 @@ router.get("/admission", async (req, res) => {
         relativeType: patient?.relativeType,
         relativeName: patient?.relativeName,
         ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
         gender: patient?.gender,
         cellNo: patient?.cellNo,
       };
@@ -199,6 +201,8 @@ router.get("/admission", async (req, res) => {
       relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
       relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
       ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      ageMonth: mrNoToPatientNameMap[item.mrNo]?.ageMonth,
+      ageDay: mrNoToPatientNameMap[item.mrNo]?.ageDay,
       cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
       gender: mrNoToPatientNameMap[item.mrNo]?.gender,
     }));

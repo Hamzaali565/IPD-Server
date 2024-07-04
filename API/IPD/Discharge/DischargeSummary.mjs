@@ -3,6 +3,7 @@ import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/Consul
 import {
   AdmissionConsultantModel,
   AdmissionPartyModel,
+  AdmissionWardModel,
 } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 import { DischargeSummaryModel } from "../../../DBRepo/IPD/Discharge/DischargeSummaryModel.mjs";
 import moment from "moment-timezone";
@@ -34,6 +35,28 @@ router.post("/ipddischargeSummary", async (req, res) => {
 
     if (dischargeSummaryData.length <= 0)
       throw new Error("PLEASE FILL SOME DETAILS IN DISCHARGE SUMMARY !!!");
+
+    const summaryCheck = await DischargeSummaryModel.find({ admissionNo });
+    if (summaryCheck.length > 0) {
+      console.log("req.body", req.body);
+      const updateData = await DischargeSummaryModel.findOneAndUpdate(
+        { admissionNo },
+        {
+          mrNo,
+          admissionNo,
+          createUser,
+          dischargeCondition,
+          dischargeDoctor,
+          dischargeSummaryData,
+          createdOn: moment(new Date())
+            .tz("Asia/Karachi")
+            .format("DD/MM/YYYY HH:mm:ss"),
+        },
+        { new: true }
+      );
+      res.status(200).send({ message: "Data updated Successfully" });
+      return;
+    }
 
     const response = await DischargeSummaryModel.create({
       mrNo,
@@ -77,6 +100,10 @@ router.get("/dischargeconsultant", async (req, res) => {
       _id: item?._id,
       party: party[0]?.party,
     }));
+    const ward = await AdmissionWardModel.find({
+      admissionNo,
+      activeOnAdmission: true,
+    });
     const admission = await AdmissionModel.find({
       admissionNo,
       dischargeSummary: true,
@@ -85,7 +112,7 @@ router.get("/dischargeconsultant", async (req, res) => {
     if (admission.length > 0) {
       disSummary = await DischargeSummaryModel.find({ admissionNo });
     }
-    res.status(200).json({ data: updatedData, data2: disSummary });
+    res.status(200).json({ data: updatedData, data2: disSummary, data3: ward });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
