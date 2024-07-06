@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
-import AutoIncrementFactory from "mongoose-sequence";
 
+import AutoIncrementFactory from "mongoose-sequence";
 const AutoIncrement = AutoIncrementFactory(mongoose.connection);
 
 const finalBill = new mongoose.Schema({
   admissionNo: { type: String, required: true },
   mrNo: { type: String, required: true },
   admissionUser: { type: String, required: true },
-  admissionDate: { type: Date, required: true },
+  admissionDate: { type: String, required: true },
   dischargeUser: { type: String, required: true },
   dischargeDate: { type: Date, required: true },
   wardName: { type: String, required: true },
@@ -27,8 +27,8 @@ const finalBill = new mongoose.Schema({
   billUser: { type: String, required: true },
   billDate: { type: String, required: true },
   isDelete: { type: Boolean, default: false },
-  deletedUser: { type: String, required: true },
-  deletedOn: { type: String, required: true },
+  deletedUser: { type: String },
+  deletedOn: { type: String },
 });
 
 finalBill.plugin(AutoIncrement, { inc_field: "billNo" });

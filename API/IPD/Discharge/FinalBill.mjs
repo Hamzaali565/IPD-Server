@@ -28,31 +28,17 @@ router.post("/finalbill", async (req, res) => {
       totalRadiology,
       billUser,
     } = req.body;
-    if (
-      ![
-        admissionNo,
-        mrNo,
-        admissionUser,
-        admissionDate,
-        dischargeUser,
-        dischargeDate,
-        wardName,
-        bedNo,
-        totalBill,
-        totalDeposit,
-        totalRefund,
-        totalRecievable,
-        totalWard,
-        totalProcedure,
-        totalVisit,
-        totalServices,
-        totalMedicine,
-        totalLab,
-        totalRadiology,
-        billUser,
-      ].every(Boolean)
-    )
-      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+    const checkBill = await FinalBillModel.find({
+      admissionNo,
+      isDelete: false,
+    });
+    if (checkBill.length > 0) throw new Error("Bill Already created!!!");
+    const dischargeCheck = await AdmissionModel.find({
+      admissionNo,
+      discharge: true,
+    });
+    if (dischargeCheck.length == 0)
+      throw new Error("Admission Not Discharged!!!");
     const response = await FinalBillModel.create({
       admissionNo,
       mrNo,
@@ -78,15 +64,14 @@ router.post("/finalbill", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
-
     const updateAdmission = await AdmissionModel.findOneAndUpdate(
       { admissionNo },
       {
         $set: {
           billFlag: true,
-          billNo: response[0].billNo,
-          billUser: response[0].billUser,
-          billDate: response[0].billDate,
+          billNo: response.billNo,
+          billUser: response.billUser,
+          billDate: response.billDate,
         },
       },
       { new: true }
@@ -94,6 +79,7 @@ router.post("/finalbill", async (req, res) => {
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
+    console.log(error);
   }
 });
 
