@@ -230,6 +230,18 @@ router.get("/finalbill", async (req, res) => {
   }
 });
 
+router.get("/billtorefund", async (req, res) => {
+  try {
+    const { billNo } = req.query;
+    if (!billNo) throw new Error("BILL NO IS REQUIRED !!!");
+    const billData = await FinalBillModel.findOne({ billNo, isDelete: false });
+    if (billData.length <= 0) throw new Error("NO DATA FOUND !!!");
+    res.status(200).send({ data: billData });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 router.put("/admissionmany", async (req, res) => {
   try {
     const response = await AdmissionModel.updateMany(

@@ -349,7 +349,9 @@ router.get("/admissionbed", async (req, res) => {
 
 router.get("/billadm", async (req, res) => {
   try {
-    const response = await AdmissionModel.find({ billFlag: true });
+    const response = await AdmissionModel.find({
+      billFlag: true,
+    });
     const mrNos = response.map((item) => item.mrNo);
     const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
     const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
@@ -372,6 +374,7 @@ router.get("/billadm", async (req, res) => {
       _id: item._id,
       mrNo: item.mrNo,
       admissionNo: item.admissionNo,
+      billNo: item?.billNo,
       patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
       patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
       relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
