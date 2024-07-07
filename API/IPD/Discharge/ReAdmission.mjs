@@ -25,7 +25,11 @@ router.post("/readmission", async (req, res) => {
     } = req.body;
     if (![reAdmissionType, reAdmitUser, admissionNo, mrNo].every(Boolean))
       throw new Error("ALL FIELDS ARE REQUIRED!!!");
-    console.log("body", req.body);
+    const checkBed = await IPDBedModel.find({ mrNo });
+    if (checkBed.length > 0)
+      throw new Error(
+        `PATIENT ALREADY ADMITTED IN ${checkBed[0]?.wardName} ON BED NO ${checkBed[0].bedNumber}`
+      );
     const response = await REAdmissionModel.create({
       reAdmissionType,
       reAdmitUser,
@@ -38,7 +42,6 @@ router.post("/readmission", async (req, res) => {
     });
 
     const findBed = await IPDBedModel.find({ _id: bedId });
-    console.log("findBed", findBed);
     if (findBed[0]?.reserved === true)
       throw new Error("THIS  BED IS ALREADY RESERVED!!!");
 

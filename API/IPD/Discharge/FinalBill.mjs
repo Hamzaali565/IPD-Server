@@ -102,9 +102,9 @@ router.put("/billdelete", async (req, res) => {
     const refundCheck = await FinalBillModel.find({
       admissionNo,
       isDelete: false,
-      isRefund: false,
     });
-    if (refundCheck.length <= 0)
+    console.log(refundCheck);
+    if (refundCheck[0]?.isRefund === true)
       throw new Error(
         "CANNOT DELETE BILL BECAUSE REFUND HAS BEEN CREATED AGAINST THIS BILL !!!"
       );
