@@ -19,6 +19,7 @@ import DischargeSummary from "../../API/IPD/Discharge/DischargeSummary.mjs";
 import PatientDischarge from "../../API/IPD/Discharge/PatientDischarge.mjs";
 import ReAdmission from "../../API/IPD/Discharge/ReAdmission.mjs";
 import FinalBill from "../../API/IPD/Discharge/FinalBill.mjs";
+import PaymentRefund from "../../API/IPD/Payment/PaymentRefund.mjs";
 
 const router = express.Router();
 
@@ -37,6 +38,7 @@ router.use(ProcedureCharges);
 router.use(AddServiceCharges);
 router.use(RoomTransfer);
 router.use(PaymentReciept);
+router.use(PaymentRefund);
 router.use(RunningBill);
 router.use(DischargeSummary);
 router.use(PatientDischarge);

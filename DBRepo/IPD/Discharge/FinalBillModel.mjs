@@ -27,6 +27,7 @@ const finalBill = new mongoose.Schema({
   billUser: { type: String, required: true },
   billDate: { type: String, required: true },
   isDelete: { type: Boolean, default: false },
+  isRefund: { type: Boolean, default: false },
   deletedUser: { type: String },
   deletedOn: { type: String },
 });

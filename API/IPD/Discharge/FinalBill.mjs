@@ -99,7 +99,15 @@ router.post("/finalbill", async (req, res) => {
 router.put("/billdelete", async (req, res) => {
   try {
     const { admissionNo } = req.body;
-
+    const refundCheck = await FinalBillModel.find({
+      admissionNo,
+      isDelete: false,
+      isRefund: false,
+    });
+    if (refundCheck.length <= 0)
+      throw new Error(
+        "CANNOT DELETE BILL BECAUSE REFUND HAS BEEN CREATED AGAINST THIS BILL !!!"
+      );
     const response = await FinalBillModel.findOneAndUpdate(
       { admissionNo, isDelete: false },
       {
@@ -242,6 +250,52 @@ router.get("/billtorefund", async (req, res) => {
   }
 });
 
+router.get("/billadmref", async (req, res) => {
+  try {
+    const BillData = await FinalBillModel.find({
+      isDelete: false,
+    });
+
+    const response = BillData.filter((items) => items?.isRefund !== true);
+
+    const mrNos = response.map((item) => item.mrNo);
+    const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+      };
+      return acc;
+    }, {});
+
+    // Step 4: Add patientName to the original response
+    const updatedResponse = response.map((item) => ({
+      _id: item._id,
+      mrNo: item.mrNo,
+      admissionNo: item.admissionNo,
+      billNo: item?.billNo,
+      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      ageMonth: mrNoToPatientNameMap[item.mrNo]?.ageMonth,
+      ageDay: mrNoToPatientNameMap[item.mrNo]?.ageDay,
+      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+    }));
+    res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
 router.put("/admissionmany", async (req, res) => {
   try {
     const response = await AdmissionModel.updateMany(
