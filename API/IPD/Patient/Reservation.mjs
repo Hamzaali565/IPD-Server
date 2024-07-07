@@ -4,6 +4,7 @@ import moment from "moment-timezone";
 import { ShiftModel } from "../../../DBRepo/IPD/Shift/ShiftModel.mjs";
 import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
+import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
 
 const router = express.Router();
 
@@ -131,6 +132,57 @@ router.get("/reservation", async (req, res) => {
       fromDate: item.fromDate,
       toDate: item.toDate,
       consultantId: item.consultantId,
+      shiftNo: item.shiftNo,
+      amount: item.amount,
+      createdUser: item.createdUser,
+      createdOn: item.createdOn,
+      reservationNo: item.reservationNo,
+      __v: item.__v,
+      AdmissionStatus: item.AdmissionStatus,
+      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+    }));
+    res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/reservationall", async (req, res) => {
+  try {
+    const response = await ReservationModel.find({});
+    if (response.length <= 0) throw new Error("NO DATA FOUND!!!");
+    const consultantName = await ConsultantsModel.find({
+      _id: response[0]?.consultantId,
+    });
+    const mrNos = response.map((item) => item.mrNo);
+    const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+      };
+      return acc;
+    }, {});
+
+    // Step 4: Add patientName to the original response
+    const updatedResponse = response.map((item) => ({
+      _id: item._id,
+      mrNo: item.mrNo,
+      fromDate: item.fromDate,
+      toDate: item.toDate,
+      consultantId: item.consultantId,
+      consultantName: consultantName[0]?.name,
       shiftNo: item.shiftNo,
       amount: item.amount,
       createdUser: item.createdUser,
