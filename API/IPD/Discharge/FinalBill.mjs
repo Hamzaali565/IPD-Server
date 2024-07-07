@@ -230,4 +230,17 @@ router.get("/finalbill", async (req, res) => {
   }
 });
 
+router.put("/admissionmany", async (req, res) => {
+  try {
+    const response = await AdmissionModel.updateMany(
+      {},
+      { reAdmissionType: "" },
+      { new: true }
+    );
+    res.status(200).send({ message: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 export default router;

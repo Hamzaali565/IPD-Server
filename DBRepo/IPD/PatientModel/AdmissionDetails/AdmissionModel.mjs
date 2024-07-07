@@ -19,6 +19,7 @@ const admissionSchema = new mongoose.Schema({
   discharge: { type: Boolean, default: false },
   dischargeDate: { type: String },
   dischargeUser: { type: String },
+  reAdmissionType: { type: String },
   billingLock: { type: Boolean, default: false },
   reservationNo: { type: String },
   billNo: { type: Number },

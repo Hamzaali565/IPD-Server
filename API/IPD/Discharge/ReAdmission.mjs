@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import { REAdmissionModel } from "../../../DBRepo/IPD/Discharge/REAdmissionModel.mjs";
 import moment from "moment-timezone";
 import {
@@ -111,14 +111,20 @@ router.post("/readmission", async (req, res) => {
     if (reAdmissionType === "Correction") {
       const updateAdmission = await AdmissionModel.findOneAndUpdate(
         { admissionNo },
-        { $set: { discharge: false } },
+        { $set: { discharge: false, reAdmissionType: "Correction" } },
         { new: true }
       );
     }
     if (reAdmissionType === "On-Consultant Advice") {
       const updateAdmission2 = await AdmissionModel.findOneAndUpdate(
         { admissionNo },
-        { $set: { discharge: false, dischargeDate: "" } },
+        {
+          $set: {
+            discharge: false,
+            dischargeDate: "",
+            reAdmissionType: "On-Consultant Advice",
+          },
+        },
         { new: true }
       );
     }
