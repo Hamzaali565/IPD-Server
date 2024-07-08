@@ -75,6 +75,8 @@ router.post("/admission", async (req, res) => {
         `THIS PATIENT IS ALREADY ADMITTED IN ${mrAdmittedCheck[0]?.wardName} ON BED NO. ${mrAdmittedCheck[0]?.bedNumber}`
       );
 
+    const patientData = await PatientRegModel.find({ MrNo: mrNo });
+
     const admissionC = await AdmissionModel.create({
       admissionType,
       mrNo,
@@ -126,6 +128,9 @@ router.post("/admission", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
+    const consultantName = await ConsultantsModel.find({
+      _id: consultantC?.consultantId,
+    });
 
     const wardChargesC = await AdmissionWardChargesModel.create({
       wardName,
@@ -164,9 +169,14 @@ router.post("/admission", async (req, res) => {
         { new: true }
       );
     }
-    res
-      .status(200)
-      .send({ data: [admissionC, PartyC, wardC, consultantC, wardChargesC] });
+
+    res.status(200).send({
+      admissionData: [admissionC],
+      patientData,
+      wardDetails: [wardC],
+      partyData: [PartyC],
+      consultantData: consultantName,
+    });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
