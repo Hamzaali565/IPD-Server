@@ -60,30 +60,36 @@ router.post("/reservation", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
+
     const mrNoToPatientNameMap = await PatientRegModel.find({ MrNo: mrNo });
     const consultantName = await ConsultantsModel.find({
-      _id: response[0]?.consultantId,
+      _id: response?.consultantId,
     });
-    // const updatedData = response.map((item) => ({
-    //   mrNo: item?.mrNo,
-    //   fromDate: item?.fromDate,
-    //   toDate: item?.toDate,
-    //   consultantName: consultantName[0]?.name,
-    //   shiftNo: item?.shiftNo,
-    //   amount: item?.amount,
-    //   createdUser: item?.createdUser,
-    //   createdOn: item?.createdOn,
-    //   patientName: mrNoToPatientNameMap[0]?.patientName,
-    //   patientType: mrNoToPatientNameMap[0]?.patientType,
-    //   relativeType: mrNoToPatientNameMap[0]?.relativeType,
-    //   relativeName: mrNoToPatientNameMap[0]?.relativeName,
-    //   ageYear: mrNoToPatientNameMap[0]?.ageYear,
-    //   ageMonth: mrNoToPatientNameMap[0]?.ageMonth,
-    //   ageDay: mrNoToPatientNameMap[0]?.ageDay,
-    //   cellNo: mrNoToPatientNameMap[0]?.cellNo,
-    //   gender: mrNoToPatientNameMap[0]?.gender,
-    // }));
-    console.log("response", response);
+
+    const updatedData = {
+      reservationNo: response?.reservationNo,
+      mrNo: response?.mrNo,
+      fromDate: response?.fromDate,
+      toDate: response?.toDate,
+      consultantName: consultantName[0]?.name,
+      shiftNo: response?.shiftNo,
+      amount: response?.amount,
+      createdUser: response?.createdUser,
+      createdOn: response?.createdOn,
+      patientName: mrNoToPatientNameMap[0]?.patientName,
+      patientType: mrNoToPatientNameMap[0]?.patientType,
+      relativeType: mrNoToPatientNameMap[0]?.relativeType,
+      relativeName: mrNoToPatientNameMap[0]?.relativeName,
+      ageYear: mrNoToPatientNameMap[0]?.ageYear,
+      ageMonth: mrNoToPatientNameMap[0]?.ageMonth,
+      ageDay: mrNoToPatientNameMap[0]?.ageDay,
+      cellNo: mrNoToPatientNameMap[0]?.cellNo,
+      gender: mrNoToPatientNameMap[0]?.gender,
+      address: mrNoToPatientNameMap[0]?.address,
+    };
+
+    console.log(updatedData);
+
     const response2 = await PaymentRecieptModel.create({
       againstNo: response?.reservationNo,
       amount,
@@ -97,7 +103,7 @@ router.post("/reservation", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
-    res.status(200).send({ data: response });
+    res.status(200).send({ data: updatedData });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -193,6 +199,7 @@ router.get("/reservationall", async (req, res) => {
         ageDay: patient?.ageDay,
         gender: patient?.gender,
         cellNo: patient?.cellNo,
+        address: patient?.address,
       };
       return acc;
     }, {});
@@ -220,6 +227,7 @@ router.get("/reservationall", async (req, res) => {
       ageDay: mrNoToPatientNameMap[item?.mrNo]?.ageDay,
       cellNo: mrNoToPatientNameMap[item?.mrNo]?.cellNo,
       gender: mrNoToPatientNameMap[item?.mrNo]?.gender,
+      address: mrNoToPatientNameMap[item?.mrNo]?.address,
     }));
     res.status(200).send({ data: updatedResponse });
   } catch (error) {
