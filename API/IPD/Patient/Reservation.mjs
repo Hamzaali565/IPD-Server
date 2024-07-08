@@ -60,6 +60,29 @@ router.post("/reservation", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
+    const mrNoToPatientNameMap = await PatientRegModel.find({ MrNo: mrNo });
+    const consultantName = await ConsultantsModel.find({
+      _id: response[0]?.consultantId,
+    });
+    // const updatedData = response.map((item) => ({
+    //   mrNo: item?.mrNo,
+    //   fromDate: item?.fromDate,
+    //   toDate: item?.toDate,
+    //   consultantName: consultantName[0]?.name,
+    //   shiftNo: item?.shiftNo,
+    //   amount: item?.amount,
+    //   createdUser: item?.createdUser,
+    //   createdOn: item?.createdOn,
+    //   patientName: mrNoToPatientNameMap[0]?.patientName,
+    //   patientType: mrNoToPatientNameMap[0]?.patientType,
+    //   relativeType: mrNoToPatientNameMap[0]?.relativeType,
+    //   relativeName: mrNoToPatientNameMap[0]?.relativeName,
+    //   ageYear: mrNoToPatientNameMap[0]?.ageYear,
+    //   ageMonth: mrNoToPatientNameMap[0]?.ageMonth,
+    //   ageDay: mrNoToPatientNameMap[0]?.ageDay,
+    //   cellNo: mrNoToPatientNameMap[0]?.cellNo,
+    //   gender: mrNoToPatientNameMap[0]?.gender,
+    // }));
     console.log("response", response);
     const response2 = await PaymentRecieptModel.create({
       againstNo: response?.reservationNo,
@@ -74,7 +97,7 @@ router.post("/reservation", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
-    res.status(200).send({ data: response2 });
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -157,9 +180,6 @@ router.get("/reservationall", async (req, res) => {
   try {
     const response = await ReservationModel.find({});
     if (response.length <= 0) throw new Error("NO DATA FOUND!!!");
-    const consultantName = await ConsultantsModel.find({
-      _id: response[0]?.consultantId,
-    });
     const mrNos = response.map((item) => item.mrNo);
     const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
     const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
@@ -169,6 +189,8 @@ router.get("/reservationall", async (req, res) => {
         relativeType: patient?.relativeType,
         relativeName: patient?.relativeName,
         ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
         gender: patient?.gender,
         cellNo: patient?.cellNo,
       };
@@ -182,7 +204,6 @@ router.get("/reservationall", async (req, res) => {
       fromDate: item.fromDate,
       toDate: item.toDate,
       consultantId: item.consultantId,
-      consultantName: consultantName[0]?.name,
       shiftNo: item.shiftNo,
       amount: item.amount,
       createdUser: item.createdUser,
@@ -190,15 +211,27 @@ router.get("/reservationall", async (req, res) => {
       reservationNo: item.reservationNo,
       __v: item.__v,
       AdmissionStatus: item.AdmissionStatus,
-      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
-      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
-      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
-      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
-      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
-      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
-      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+      patientName: mrNoToPatientNameMap[item?.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item?.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item?.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item?.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item?.mrNo]?.ageYear,
+      ageMonth: mrNoToPatientNameMap[item?.mrNo]?.ageMonth,
+      ageDay: mrNoToPatientNameMap[item?.mrNo]?.ageDay,
+      cellNo: mrNoToPatientNameMap[item?.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item?.mrNo]?.gender,
     }));
     res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/reservationconsultant", async (req, res) => {
+  try {
+    const { consultantId } = req.query;
+    const response = await ConsultantsModel.find({ _id: consultantId });
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
