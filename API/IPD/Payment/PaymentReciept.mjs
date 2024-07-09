@@ -17,6 +17,7 @@ router.post("/paymentreciept", async (req, res) => {
       remarks,
       createdUser,
     } = req.body;
+
     if (
       ![
         againstNo,
@@ -30,6 +31,7 @@ router.post("/paymentreciept", async (req, res) => {
       ].every(Boolean)
     )
       throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+
     const response = await PaymentRecieptModel.create({
       againstNo,
       amount,
@@ -44,7 +46,44 @@ router.post("/paymentreciept", async (req, res) => {
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
     });
-    res.status(200).send({ data: response });
+
+    const patientDetails = await PatientRegModel.find({ MrNo: mrNo });
+
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+        address: patient?.address,
+      };
+      return acc;
+    }, {});
+
+    const patientInfo = mrNoToPatientNameMap[mrNo] || {};
+
+    const updatedResponse = {
+      _id: response._id,
+      mrNo: response.mrNo,
+      againstNo: response.againstNo,
+      amount: response.amount,
+      createdUser: response.createdUser,
+      createdOn: response.createdOn,
+      location: response.location,
+      paymentAgainst: response.paymentAgainst,
+      paymentType: response.paymentType,
+      remarks: response.remarks,
+      shiftNo: response.shiftNo,
+      paymentNo: response.paymentNo,
+      ...patientInfo,
+    };
+
+    res.status(200).send({ data: updatedResponse });
   } catch (error) {
     res.status(400).send({ message: error.message, data: req.body });
   }
