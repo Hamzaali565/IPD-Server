@@ -68,4 +68,33 @@ router.get("/parentservice", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
+router.get("/radiologyservices", async (req, res) => {
+  try {
+    const response = await serviceNameModel.find({}, "parentName");
+    if (response.length <= 0) throw new Error("NO SERVICE FOUND!!!");
+
+    const allowedServices = ["CT SCAN", "Ultra Sound", "X-Ray", "MRI"];
+
+    const filteredServices = response.filter((service) =>
+      allowedServices.includes(service.parentName)
+    );
+
+    const uniqueWardNames = filteredServices.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.parentName === item.parentName)
+    );
+
+    const nameChange = uniqueWardNames.map((items) => ({
+      name: items?.parentName,
+      _id: items?._id,
+    }));
+
+    nameChange.unshift({ name: "--" });
+    res.status(200).send({ data: nameChange });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 export default router;
