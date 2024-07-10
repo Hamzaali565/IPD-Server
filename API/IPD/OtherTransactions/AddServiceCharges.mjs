@@ -5,6 +5,8 @@ import { AdmissionPartyModel } from "../../../DBRepo/IPD/PatientModel/AdmissionD
 import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
 import { serviceChargesModel } from "../../../DBRepo/IPD/Masters/IPDServiceChargesModel.mjs";
 import { AdmissionModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/AdmissionModel.mjs";
+import { serviceNameModel } from "../../../DBRepo/General/Service/ServiceModel.mjs";
+import { DSChargesModel } from "../../../DBRepo/IPD/Masters/DSChargesModel.mjs";
 
 const router = express.Router();
 
@@ -88,6 +90,29 @@ router.get("/allservices", async (req, res) => {
       wardName: wardName[0].wardName,
       party: party[0].party,
       "serviceDetails.status": true,
+    });
+    const allServiceDetails = serviceCharges.flatMap(
+      (item) => item.serviceDetails
+    );
+
+    const filterData = allServiceDetails.filter(
+      (item) => item.status !== false
+    );
+
+    res.status(200).send({ data: filterData });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+router.get("/allRadioservices", async (req, res) => {
+  try {
+    const { party } = req.query;
+    if (!party) throw new Error("PARTY NAME IS REQUIRED!!!");
+
+    const serviceCharges = await DSChargesModel.find({
+      party: party,
+      "serviceDetails.status": true,
+      parentName: { $in: ["CT SCAN", "Ultra Sound", "X-Ray", "MRI"] },
     });
     const allServiceDetails = serviceCharges.flatMap(
       (item) => item.serviceDetails
