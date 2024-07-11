@@ -26,7 +26,7 @@ const radiologyBooking = new mongoose.Schema({
     },
   ],
   createdUser: { type: String, required: true },
-  createdDate: { type: String, required: true },
+  createdOn: { type: String, required: true },
 });
 
 radiologyBooking.plugin(AutoIncrement, { inc_field: "radiologyNo" });
