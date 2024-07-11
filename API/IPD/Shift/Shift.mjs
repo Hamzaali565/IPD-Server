@@ -18,7 +18,7 @@ router.post("/shift", async (req, res) => {
       status: true,
       createdOn: `${moment(new Date())
         .tz("Asia/Karachi")
-        .format("YYYY/MM/DD HH:mm:ss")}`,
+        .format("DD/MM/YYYY HH:mm:ss")}`,
     });
     res.status(200).send({ data: response });
   } catch (error) {
@@ -39,7 +39,7 @@ router.put("/shift", async (req, res) => {
           status: false,
           endedOn: `${moment(new Date())
             .tz("Asia/Karachi")
-            .format("YYYY/MM/DD HH:mm:ss")}`,
+            .format("DD/MM/YYYY HH:mm:ss")}`,
         },
       },
       { new: true }

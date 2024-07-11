@@ -123,7 +123,7 @@ router.put("/reservation", async (req, res) => {
           updatedUser,
           updatedOn: moment(new Date())
             .tz("Asia/Karachi")
-            .format("YYYY-MM-DD HH:mm:ss"),
+            .format("DD/MM/YYYY HH:mm:ss"),
         },
       },
       { new: true }
