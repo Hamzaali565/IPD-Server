@@ -1,6 +1,7 @@
 import express from "express";
 import { RadiologyBookingModel } from "../../../DBRepo/Radiology/Transaction/RadiologyBookingModel.mjs";
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
+import moment from "moment-timezone";
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.post("/radiologybooking", async (req, res) => {
       createdUser,
       shiftNo,
     } = req.body;
+
     if (
       ![
         mrNo,
@@ -57,10 +59,11 @@ router.post("/radiologybooking", async (req, res) => {
       mrNo,
       remarks,
       createdUser,
-      createdOn,
+      createdOn: response?.createdOn,
     });
+    res.status(200).send({ data: response, data2: payment });
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).send({ message: error.message, body: req.body });
   }
 });
 
