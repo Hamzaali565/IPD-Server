@@ -1,6 +1,7 @@
 import express from "express";
 import { RadiologyBookingModel } from "../../../DBRepo/Radiology/Transaction/RadiologyBookingModel.mjs";
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
+import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 import moment from "moment-timezone";
 import { resetCounter } from "../../General/ResetCounter/ResetCounter.mjs";
 
@@ -70,10 +71,10 @@ router.post("/radiologybooking", async (req, res) => {
 
 router.get("/radiologybooking", async (req, res) => {
   try {
-    const { mrNo } = req.query;
-    if (![mrNo].every(Boolean))
+    const { radiologyNo } = req.query;
+    if (![radiologyNo].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
-    const response = await RadiologyBookingModel.find({ mrNo });
+    const response = await RadiologyBookingModel.find({ radiologyNo });
 
     if (response.length <= 0)
       throw new Error("NO SERVICES ADDED TO THIS PATIENT!!!");
@@ -104,6 +105,47 @@ router.put("/radiologybooking", async (req, res) => {
       }
     );
     res.status(200).send({ Data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/radiologydetails", async (req, res) => {
+  try {
+    const response = await RadiologyBookingModel.find({});
+    const mrNos = response.map((item) => item.mrNo);
+    const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+      };
+      return acc;
+    }, {});
+
+    // Step 4: Add patientName to the original response
+    const updatedResponse = response.map((item) => ({
+      _id: item._id,
+      mrNo: item.mrNo,
+      radiologyNo: item.radiologyNo,
+      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      ageMonth: mrNoToPatientNameMap[item.mrNo]?.ageMonth,
+      ageDay: mrNoToPatientNameMap[item.mrNo]?.ageDay,
+      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+    }));
+    res.status(200).send({ data: updatedResponse });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
