@@ -86,6 +86,29 @@ router.get("/radiologybooking", async (req, res) => {
   }
 });
 
+router.put("/radiologybooking", async (req, res) => {
+  try {
+    const { uniqueId, mrNo, deletedUser } = req.body;
+    if (![uniqueId, mrNo, deletedUser].every(Boolean))
+      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+    const response = await RadiologyBookingModel.updateOne(
+      { "serviceDetails.uniqueId": uniqueId },
+      {
+        $set: {
+          "serviceDetails.$.isDeleted": true,
+          "serviceDetails.$.deletedUser": deletedUser,
+          "serviceDetails.$.deletedOn": moment(new Date())
+            .tz("Asia/Karachi")
+            .format("DD/MM/YYYY HH:mm:ss"),
+        },
+      }
+    );
+    res.status(200).send({ Data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 router.delete("/deleteCollectionRadiology", async (req, res) => {
   try {
     const response = await RadiologyBookingModel.collection.drop();
