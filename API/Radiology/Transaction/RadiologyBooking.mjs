@@ -2,6 +2,7 @@ import express from "express";
 import { RadiologyBookingModel } from "../../../DBRepo/Radiology/Transaction/RadiologyBookingModel.mjs";
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
 import moment from "moment-timezone";
+import { resetCounter } from "../../General/ResetCounter/ResetCounter.mjs";
 
 const router = express.Router();
 
@@ -64,6 +65,35 @@ router.post("/radiologybooking", async (req, res) => {
     res.status(200).send({ data: response, data2: payment });
   } catch (error) {
     res.status(400).send({ message: error.message, body: req.body });
+  }
+});
+
+router.get("/radiologybooking", async (req, res) => {
+  try {
+    const { mrNo } = req.query;
+    if (![mrNo].every(Boolean))
+      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+    const response = await RadiologyBookingModel.find({ mrNo });
+
+    if (response.length <= 0)
+      throw new Error("NO SERVICES ADDED TO THIS PATIENT!!!");
+
+    const flatData = response.flatMap((item) => item?.serviceDetails);
+    const updatedData = flatData.filter((items) => items?.isDeleted !== false);
+    res.status(200).send({ data: updatedData });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.delete("/deleteCollectionRadiology", async (req, res) => {
+  try {
+    const response = await RadiologyBookingModel.collection.drop();
+    resetCounter("radiologyNo");
+
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
   }
 });
 
