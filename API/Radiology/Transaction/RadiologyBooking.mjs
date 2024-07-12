@@ -89,8 +89,8 @@ router.get("/radiologybooking", async (req, res) => {
 
 router.put("/radiologybooking", async (req, res) => {
   try {
-    const { uniqueId, mrNo, deletedUser } = req.body;
-    if (![uniqueId, mrNo, deletedUser].every(Boolean))
+    const { uniqueId, deletedUser } = req.body;
+    if (![uniqueId, deletedUser].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
     const response = await RadiologyBookingModel.updateOne(
       { "serviceDetails.uniqueId": uniqueId },
