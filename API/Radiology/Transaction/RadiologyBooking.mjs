@@ -117,6 +117,7 @@ router.put("/radiologybooking", async (req, res) => {
           "serviceDetails.$.deletedOn": moment(new Date())
             .tz("Asia/Karachi")
             .format("DD/MM/YYYY HH:mm:ss"),
+          isRemain: true,
         },
       }
     );
@@ -242,6 +243,28 @@ router.put("/manyupdatesradio", async (req, res) => {
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ error: error.message });
+  }
+});
+
+router.put("/paymentrefundradiology", async (req, res) => {
+  try {
+    const { uniqueId } = req.body;
+    if (uniqueId.length <= 0) throw new Error("UNIQUE ID IS REQUIRED !!!");
+    const response = await RadiologyBookingModel.updateMany(
+      { "serviceDetails.uniqueId": { $in: uniqueId } },
+      {
+        $set: {
+          "serviceDetails.$.refund": true,
+          "serviceDetails.$.refundUser": refundUser,
+          "serviceDetails.$.refundOn": moment(new Date())
+            .tz("Asia/Karachi")
+            .format("DD/MM/YYYY HH:mm:ss"),
+          isRemain: false,
+        },
+      }
+    );
+  } catch (error) {
+    res.status(400).send({ message: error.message });
   }
 });
 
