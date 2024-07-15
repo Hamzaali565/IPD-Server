@@ -96,7 +96,9 @@ router.get("/radiologyreverse", async (req, res) => {
     if (response.length <= 0)
       throw new Error("NO SERVICES ADDED TO THIS PATIENT!!!");
     const flatData = response.flatMap((item) => item?.serviceDetails);
-    const updatedData = flatData.filter((items) => items?.isDeleted !== false);
+    const updatedData = flatData.filter(
+      (items) => items?.isDeleted !== false && items?.refund !== true
+    );
     res.status(200).send({ data: updatedData });
   } catch (error) {
     res.status(400).send({ message: error.message });
