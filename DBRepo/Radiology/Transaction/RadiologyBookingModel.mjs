@@ -27,6 +27,8 @@ const radiologyBooking = new mongoose.Schema({
   ],
   createdUser: { type: String, required: true },
   createdOn: { type: String, required: true },
+  isRemain: { type: Boolean, default: false },
+  isDeletedAll: { type: Boolean, default: false },
 });
 
 radiologyBooking.plugin(AutoIncrement, { inc_field: "radiologyNo" });

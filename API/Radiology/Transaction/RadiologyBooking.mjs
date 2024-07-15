@@ -120,7 +120,22 @@ router.put("/radiologybooking", async (req, res) => {
         },
       }
     );
-    res.status(200).send({ Data: response });
+    const update = await RadiologyBookingModel.find({
+      "serviceDetails.uniqueId": uniqueId,
+    });
+    const checkData = update[0].serviceDetails.every(
+      (items) => items?.isDeleted
+    );
+    console.log(checkData);
+    if (checkData === true) {
+      const finalupdate = await RadiologyBookingModel.updateOne(
+        { "serviceDetails.uniqueId": uniqueId },
+        { isDeletedAll: true }
+      );
+      res.status(200).send({ message: "Deleted Successfully" });
+      return;
+    }
+    res.status(200).send({ Data: "Deleted Successfully" });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -128,7 +143,7 @@ router.put("/radiologybooking", async (req, res) => {
 
 router.get("/radiologydetails", async (req, res) => {
   try {
-    const response = await RadiologyBookingModel.find({});
+    const response = await RadiologyBookingModel.find({ isDeletedAll: false });
     const mrNos = response.map((item) => item.mrNo);
     const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
     const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
@@ -175,6 +190,18 @@ router.delete("/deleteCollectionRadiology", async (req, res) => {
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
+  }
+});
+
+router.put("/manyupdatesradio", async (req, res) => {
+  try {
+    const response = await RadiologyBookingModel.updateMany(
+      {},
+      { isDeletedAll: false }
+    );
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
   }
 });
 
