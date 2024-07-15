@@ -126,7 +126,6 @@ router.put("/radiologybooking", async (req, res) => {
     const checkData = update[0].serviceDetails.every(
       (items) => items?.isDeleted
     );
-    console.log(checkData);
     if (checkData === true) {
       const finalupdate = await RadiologyBookingModel.updateOne(
         { "serviceDetails.uniqueId": uniqueId },
