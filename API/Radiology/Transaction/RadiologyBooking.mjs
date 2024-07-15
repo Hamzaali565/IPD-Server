@@ -181,6 +181,47 @@ router.get("/radiologydetails", async (req, res) => {
   }
 });
 
+router.get("/radiologydetailsforrefund", async (req, res) => {
+  try {
+    const response = await RadiologyBookingModel.find({ isRemain: true });
+    const mrNos = response.map((item) => item.mrNo);
+    const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+      };
+      return acc;
+    }, {});
+
+    // Step 4: Add patientName to the original response
+    const updatedResponse = response.map((item) => ({
+      _id: item._id,
+      mrNo: item.mrNo,
+      radiologyNo: item.radiologyNo,
+      patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
+      patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
+      relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
+      relativeName: mrNoToPatientNameMap[item.mrNo]?.relativeName,
+      ageYear: mrNoToPatientNameMap[item.mrNo]?.ageYear,
+      ageMonth: mrNoToPatientNameMap[item.mrNo]?.ageMonth,
+      ageDay: mrNoToPatientNameMap[item.mrNo]?.ageDay,
+      cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
+      gender: mrNoToPatientNameMap[item.mrNo]?.gender,
+    }));
+    res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 router.delete("/deleteCollectionRadiology", async (req, res) => {
   try {
     const response = await RadiologyBookingModel.collection.drop();

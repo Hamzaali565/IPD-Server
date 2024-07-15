@@ -23,6 +23,8 @@ const radiologyBooking = new mongoose.Schema({
       isDeleted: { type: Boolean, default: false },
       deletedUser: { type: String },
       deletedOn: { type: String },
+      refund: { type: Boolean, default: false },
+      refundDate: { type: String },
     },
   ],
   createdUser: { type: String, required: true },
