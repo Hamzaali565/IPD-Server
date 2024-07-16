@@ -1,9 +1,10 @@
-import express from "express";
+import express, { response } from "express";
 import { RadiologyBookingModel } from "../../../DBRepo/Radiology/Transaction/RadiologyBookingModel.mjs";
 import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
 import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 import moment from "moment-timezone";
 import { resetCounter } from "../../General/ResetCounter/ResetCounter.mjs";
+import { PaymentRefundModal } from "../../../DBRepo/IPD/PaymenModels/PaymentRefundModel.mjs";
 
 const router = express.Router();
 
@@ -250,21 +251,88 @@ router.put("/manyupdatesradio", async (req, res) => {
 
 router.put("/paymentrefundradiology", async (req, res) => {
   try {
-    const { uniqueId } = req.body;
+    const {
+      uniqueId,
+      refundUser,
+      refundAgainst,
+      refundType,
+      location,
+      refundAmount,
+      shiftNo,
+      againstNo,
+      mrNo,
+      remarks,
+      createdUser,
+    } = req.body;
     if (uniqueId.length <= 0) throw new Error("UNIQUE ID IS REQUIRED !!!");
     const response = await RadiologyBookingModel.updateMany(
       { "serviceDetails.uniqueId": { $in: uniqueId } },
       {
         $set: {
-          "serviceDetails.$.refund": true,
-          "serviceDetails.$.refundUser": refundUser,
-          "serviceDetails.$.refundOn": moment(new Date())
+          "serviceDetails.$[elem].refund": true,
+          "serviceDetails.$[elem].refundUser": refundUser,
+          "serviceDetails.$[elem].refundOn": moment(new Date())
             .tz("Asia/Karachi")
             .format("DD/MM/YYYY HH:mm:ss"),
           isRemain: false,
         },
+      },
+      {
+        arrayFilters: [{ "elem.uniqueId": { $in: uniqueId } }],
       }
     );
+    const createRefundNo = await PaymentRefundModal.create({
+      refundAgainst,
+      refundType,
+      location,
+      refundAmount,
+      shiftNo,
+      againstNo,
+      mrNo,
+      remarks,
+      createdUser: refundUser,
+      createdOn: moment(new Date())
+        .tz("Asia/Karachi")
+        .format("DD/MM/YYYY HH:mm:ss"),
+    });
+
+    const patientDetails = await PatientRegModel.find({ MrNo: mrNo });
+
+    const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
+      acc[patient?.MrNo] = {
+        patientName: patient?.patientName,
+        patientType: patient?.patientType,
+        relativeType: patient?.relativeType,
+        relativeName: patient?.relativeName,
+        ageYear: patient?.ageYear,
+        ageMonth: patient?.ageMonth,
+        ageDay: patient?.ageDay,
+        gender: patient?.gender,
+        cellNo: patient?.cellNo,
+        address: patient?.address,
+      };
+      return acc;
+    }, {});
+
+    const patientInfo = mrNoToPatientNameMap[mrNo] || {};
+
+    const updatedResponse = {
+      _id: createRefundNo._id,
+      mrNo: createRefundNo.mrNo,
+      againstNo: createRefundNo.againstNo,
+      amount: createRefundNo.refundAmount,
+      createdUser: createRefundNo.createdUser,
+      createdOn: createRefundNo.createdOn,
+      location: createRefundNo.location,
+      paymentAgainst: createRefundNo.refundAgainst,
+      paymentType: createRefundNo.refundType,
+      remarks: createRefundNo.remarks,
+      shiftNo: createRefundNo.shiftNo,
+      paymentNo: createRefundNo.refundNo,
+      ...patientInfo,
+    };
+
+    res.status(200).send({ data: updatedResponse });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
