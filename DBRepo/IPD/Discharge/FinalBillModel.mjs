@@ -9,7 +9,7 @@ const finalBill = new mongoose.Schema({
   admissionUser: { type: String, required: true },
   admissionDate: { type: String, required: true },
   dischargeUser: { type: String, required: true },
-  dischargeDate: { type: Date, required: true },
+  dischargeDate: { type: String, required: true },
   wardName: { type: String, required: true },
   bedNo: { type: String, required: true },
   totalBill: { type: Number, required: true },
