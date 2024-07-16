@@ -12,6 +12,7 @@ import {
 } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/PartyModel.mjs";
 import { AdmissionModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/AdmissionModel.mjs";
 import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
+import { RadiologyBookingModel } from "../../../DBRepo/Radiology/Transaction/RadiologyBookingModel.mjs";
 
 const router = express.Router();
 
@@ -50,6 +51,14 @@ router.get("/runningbill", async (req, res) => {
       (items) => items.isdeleted !== true
     );
 
+    const radioChargesData = await RadiologyBookingModel.find({
+      admissionNo,
+    });
+    const radioFlat = radioChargesData.flatMap((item) => item.serviceDetails);
+    const radiologyCharges = radioFlat.filter(
+      (items) => items.isDeleted !== true
+    );
+
     // consultant Visit
     const consultantVisit = await ConsultantVisitModel.find({
       admissionNo,
@@ -67,6 +76,8 @@ router.get("/runningbill", async (req, res) => {
       admissionNo,
       isDeleted: false,
     });
+
+    //
 
     //Admission data
     const admissionData = await AdmissionModel.find({ admissionNo });
@@ -108,6 +119,7 @@ router.get("/runningbill", async (req, res) => {
         activeWard,
         ConsultantName,
         serviceCharges,
+        radiologyCharges,
         consultantVisit,
         procedureCharges,
         wardCharges,

@@ -19,7 +19,7 @@ const radiologyBooking = new mongoose.Schema({
     {
       serviceName: { type: String },
       quantity: { type: String },
-      amount: { type: String },
+      amount: { type: Number },
       serviceId: { type: mongoose.ObjectId },
       uniqueId: { type: String, default: uuidv4 },
       isDeleted: { type: Boolean, default: false },
