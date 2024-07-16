@@ -350,12 +350,12 @@ router.put("/paymentrefundradiology", async (req, res) => {
 
 router.post("/ipdradiology", async (req, res) => {
   try {
-    const { admissionNo, serviceDetails, consultant } = req.body;
+    const { admissionNo, serviceDetails } = req.body;
 
     const mrInfo = await AdmissionModel.find({ admissionNo });
     const mrNo = mrInfo[0]?.mrNo;
 
-    if (![admissionNo, mrNo, serviceDetails, consultant].every(Boolean))
+    if (![admissionNo, mrNo, serviceDetails].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
     if (serviceDetails.length <= 0) throw new Error("SERVICES ARE MISSING !!!");
     const response = await RadiologyBookingModel.create({
@@ -367,7 +367,6 @@ router.post("/ipdradiology", async (req, res) => {
         .format("DD/MM/YYYY HH:mm:ss"),
       patientType: "IPD",
       party: "Cash",
-      consultant,
     });
 
     res.status(200).send({ data: response });

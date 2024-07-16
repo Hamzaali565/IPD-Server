@@ -54,10 +54,27 @@ router.get("/runningbill", async (req, res) => {
     const radioChargesData = await RadiologyBookingModel.find({
       admissionNo,
     });
-    const radioFlat = radioChargesData.flatMap((item) => item.serviceDetails);
-    const radiologyCharges = radioFlat.filter(
-      (items) => items.isDeleted !== true
-    );
+    let updatedRadiologyCharges;
+    if (radioChargesData.length > 0) {
+      const date = radioChargesData[0].createdOn;
+
+      // Flatten the serviceDetails into radioFlat
+      const radioFlat = radioChargesData.flatMap((item) => item.serviceDetails);
+
+      // Filter out the items that are not deleted
+      const radiologyCharges = radioFlat.filter(
+        (items) => items.isDeleted !== true
+      );
+
+      // Add the date to each item in radiologyCharges
+      updatedRadiologyCharges = radiologyCharges.map((item) => ({
+        amount: item?.amount,
+        date: date,
+        createdUser: item?.createdUser,
+        serviceName: item?.serviceName,
+        consultant: item?.consultant,
+      }));
+    }
 
     // consultant Visit
     const consultantVisit = await ConsultantVisitModel.find({
@@ -119,7 +136,7 @@ router.get("/runningbill", async (req, res) => {
         activeWard,
         ConsultantName,
         serviceCharges,
-        radiologyCharges,
+        radiologyCharges: updatedRadiologyCharges,
         consultantVisit,
         procedureCharges,
         wardCharges,
