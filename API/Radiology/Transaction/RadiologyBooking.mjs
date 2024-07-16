@@ -4,6 +4,7 @@ import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRec
 import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
 import moment from "moment-timezone";
 import { resetCounter } from "../../General/ResetCounter/ResetCounter.mjs";
+import { AdmissionModel } from "../../../DBRepo/IPD/PatientModel/AdmissionDetails/AdmissionModel.mjs";
 import { PaymentRefundModal } from "../../../DBRepo/IPD/PaymenModels/PaymentRefundModel.mjs";
 
 const router = express.Router();
@@ -51,7 +52,9 @@ router.post("/radiologybooking", async (req, res) => {
       createdOn: moment(new Date())
         .tz("Asia/Karachi")
         .format("DD/MM/YYYY HH:mm:ss"),
+      patientType: "Cash",
     });
+
     const payment = await PaymentRecieptModel.create({
       paymentType,
       location,
@@ -146,7 +149,11 @@ router.put("/radiologybooking", async (req, res) => {
 
 router.get("/radiologydetails", async (req, res) => {
   try {
-    const response = await RadiologyBookingModel.find({ isDeletedAll: false });
+    const { patientType } = req.query;
+    const response = await RadiologyBookingModel.find({
+      isDeletedAll: false,
+      patientType,
+    });
     const mrNos = response.map((item) => item.mrNo);
     const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
     const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
@@ -187,7 +194,10 @@ router.get("/radiologydetails", async (req, res) => {
 
 router.get("/radiologydetailsforrefund", async (req, res) => {
   try {
-    const response = await RadiologyBookingModel.find({ isRemain: true });
+    const response = await RadiologyBookingModel.find({
+      isRemain: true,
+      patientType: "Cash",
+    });
     const mrNos = response.map((item) => item.mrNo);
     const patientDetails = await PatientRegModel.find({ MrNo: { $in: mrNos } });
     const mrNoToPatientNameMap = patientDetails.reduce((acc, patient) => {
@@ -333,6 +343,34 @@ router.put("/paymentrefundradiology", async (req, res) => {
     };
 
     res.status(200).send({ data: updatedResponse });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post("/ipdradiology", async (req, res) => {
+  try {
+    const { admissionNo, serviceDetails, consultant } = req.body;
+
+    const mrInfo = await AdmissionModel.find({ admissionNo });
+    const mrNo = mrInfo[0]?.mrNo;
+
+    if (![admissionNo, mrNo, serviceDetails, consultant].every(Boolean))
+      throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
+    if (serviceDetails.length <= 0) throw new Error("SERVICES ARE MISSING !!!");
+    const response = await RadiologyBookingModel.create({
+      admissionNo,
+      mrNo,
+      serviceDetails,
+      createdOn: moment(new Date())
+        .tz("Asia/Karachi")
+        .format("DD/MM/YYYY HH:mm:ss"),
+      patientType: "IPD",
+      party: "Cash",
+      consultant,
+    });
+
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
