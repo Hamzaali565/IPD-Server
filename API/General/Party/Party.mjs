@@ -3,14 +3,16 @@ import {
   ParentModel,
   PartyModel,
 } from "../../../DBRepo/General/PartyModel.mjs/Party.Model.mjs";
-import { createdOn } from "../../../src/constants";
+import { createdOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
 
 router.post("/partyparent", async (req, res) => {
   try {
+    console.log(req.body);
     const { name, createdUser } = req.body;
-    if (!name || !createdUser) throw new Error("PARENT NAME IS REQUIRED !!!");
+    if (!name || !createdUser)
+      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
     const response = await ParentModel.create({
       name: name,
       createdUser,
@@ -19,6 +21,7 @@ router.post("/partyparent", async (req, res) => {
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
+    console.log(error);
   }
 });
 
@@ -38,3 +41,15 @@ router.post("/partyname", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
+router.get("/partyparent", async (req, res) => {
+  try {
+    let response = await ParentModel.find({}, "name");
+    response.unshift({ name: "--" });
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+export default router;
