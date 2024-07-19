@@ -52,7 +52,7 @@ router.post("/adddoctor", async (req, res) => {
       cnic,
       phone,
       status,
-      updatedUser,
+      updatedUser: updatedUser,
       updatedOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
     });
     console.log("created", create);
