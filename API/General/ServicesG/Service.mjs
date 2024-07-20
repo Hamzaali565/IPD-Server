@@ -1,8 +1,26 @@
 import express from "express";
 import { serviceNameModel } from "../../../DBRepo/General/Service/ServiceModel.mjs";
 import moment from "moment";
+import { ParentServiceModel } from "../../../DBRepo/General/Service/ParentService.model.mjs";
+import { createdOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
+
+router.post("/parentservice", async (req, res) => {
+  try {
+    const { name, createdUser } = req.body;
+    if (!name || !createdUser)
+      throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
+    const response = await ParentServiceModel.create({
+      name,
+      createdUser,
+      createdOn: createdOn,
+    });
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
 
 router.post("/service", async (req, res) => {
   try {
