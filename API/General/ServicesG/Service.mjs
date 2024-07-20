@@ -2,7 +2,8 @@ import express from "express";
 import { serviceNameModel } from "../../../DBRepo/General/Service/ServiceModel.mjs";
 import moment from "moment";
 import { ParentServiceModel } from "../../../DBRepo/General/Service/ParentService.model.mjs";
-import { createdOn } from "../../../src/constants.mjs";
+import { serviceChargesModel } from "../../../DBRepo/IPD/Masters/IPDServiceChargesModel.mjs";
+import { getCreatedOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
 
@@ -14,9 +15,19 @@ router.post("/parentservice", async (req, res) => {
     const response = await ParentServiceModel.create({
       name,
       createdUser,
-      createdOn: createdOn,
+      createdOn: getCreatedOn(),
     });
     res.status(200).json(response);
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/parentservicename", async (req, res) => {
+  try {
+    const response = await ParentServiceModel.find({}, "name");
+    response.unshift({ name: "--" });
+    res.status(200).json({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -35,7 +46,7 @@ router.post("/service", async (req, res) => {
             parentName,
             serviceName,
             createdUser,
-            updatedOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
+            updatedOn: getCreatedOn(),
           },
         },
         { new: true }
@@ -47,7 +58,7 @@ router.post("/service", async (req, res) => {
       parentName,
       serviceName,
       createdUser,
-      updatedOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
+      updatedOn: getCreatedOn(),
     });
 
     res.status(200).send({ data: response });
@@ -110,6 +121,15 @@ router.get("/radiologyservices", async (req, res) => {
 
     nameChange.unshift({ name: "--" });
     res.status(200).send({ data: nameChange });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.delete("/serviceDelete", async (req, res) => {
+  try {
+    const response = await serviceChargesModel.collection.drop();
+    res.status(200).send({ message: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }

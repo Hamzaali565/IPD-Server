@@ -3,7 +3,7 @@ import {
   ParentModel,
   PartyModel,
 } from "../../../DBRepo/General/PartyModel.mjs/Party.Model.mjs";
-import { createdOn } from "../../../src/constants.mjs";
+import { getCreatedOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post("/partyparent", async (req, res) => {
     const response = await ParentModel.create({
       name: name,
       createdUser,
-      createdOn: createdOn,
+      createdOn: getCreatedOn(),
     });
     res.status(200).send({ data: response });
   } catch (error) {
@@ -34,7 +34,7 @@ router.post("/partyname", async (req, res) => {
       name: name,
       parent,
       createdUser,
-      createdOn: createdOn,
+      createdOn: getCreatedOn(),
     });
     res.status(200).send({ data: response });
   } catch (error) {
