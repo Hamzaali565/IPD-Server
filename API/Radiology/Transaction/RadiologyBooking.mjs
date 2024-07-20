@@ -73,6 +73,32 @@ router.post("/radiologybooking", async (req, res) => {
   }
 });
 
+router.get("/radiologypdf", async (req, res) => {
+  try {
+    const { radiologyNo, mrNo } = req.query;
+    if (!radiologyNo || !mrNo)
+      throw new Error("RADIOLOGY/MR-No NO IS REQUIRED !!!");
+    const Radiodata = await RadiologyBookingModel.find({ radiologyNo });
+    const updateRadioData = Radiodata[0]?.serviceDetails.filter(
+      (items) => items?.isDeleted !== true
+    );
+    const paymentdata = await PaymentRecieptModel.find({
+      againstNo: radiologyNo,
+    })
+      .sort({ _id: -1 })
+      .limit(1);
+    const patientData = await PatientRegModel.find({ MrNo: mrNo });
+    res.status(200).send({
+      data: updateRadioData,
+      data1: paymentdata,
+      data2: patientData,
+      doctor: Radiodata[0]?.consultant,
+    });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 router.get("/radiologybooking", async (req, res) => {
   try {
     const { radiologyNo } = req.query;

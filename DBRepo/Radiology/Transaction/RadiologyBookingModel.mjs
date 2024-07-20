@@ -43,6 +43,6 @@ const radiologyBooking = new mongoose.Schema({
 radiologyBooking.plugin(AutoIncrement, { inc_field: "radiologyNo" });
 
 export const RadiologyBookingModel = mongoose.model(
-  "RadiologyBookingModel",
+  "Radio Book",
   radiologyBooking
 );
