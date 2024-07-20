@@ -63,4 +63,13 @@ router.get("/party", async (req, res) => {
   }
 });
 
+router.get("/partyall", async (req, res) => {
+  try {
+    const response = await PartyModel.find({}, "name");
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 export default router;
