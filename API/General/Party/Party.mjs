@@ -52,4 +52,15 @@ router.get("/partyparent", async (req, res) => {
   }
 });
 
+router.get("/party", async (req, res) => {
+  try {
+    const { parent } = req.query;
+    if (!parent) throw new Error("PARENT NAME IS REQUIRED !!!");
+    let response = await PartyModel.find({ parent });
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 export default router;
