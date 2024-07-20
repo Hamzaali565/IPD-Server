@@ -67,7 +67,7 @@ router.post("/radiologybooking", async (req, res) => {
       createdUser,
       createdOn: response?.createdOn,
     });
-    res.status(200).send({ data: response, data2: payment });
+    res.status(200).json({ data: [response], data2: [payment] });
   } catch (error) {
     res.status(400).send({ message: error.message, body: req.body });
   }
