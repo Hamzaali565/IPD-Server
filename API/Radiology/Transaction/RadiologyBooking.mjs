@@ -67,7 +67,13 @@ router.post("/radiologybooking", async (req, res) => {
       createdUser,
       createdOn: response?.createdOn,
     });
-    res.status(200).json({ data: [response], data2: [payment] });
+    const patientData = await PatientRegModel.find({ MrNo: mrNo });
+    res.status(200).json({
+      data: response?.serviceDetails,
+      data1: [payment],
+      data2: patientData,
+      doctor: response?.consultant,
+    });
   } catch (error) {
     res.status(400).send({ message: error.message, body: req.body });
   }
