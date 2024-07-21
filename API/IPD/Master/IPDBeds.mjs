@@ -17,8 +17,21 @@ router.post("/ipdbeds", async (req, res) => {
       bedNumber,
       createdUser,
       createdOn: getCreatedOn(),
+      admissionNo: "",
+      mrNo: "",
+      party: "",
+      reserved: false,
     });
     res.status(200).send({ data: ipdbed });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.delete("/deletebeds", async (req, res) => {
+  try {
+    const response = await IPDBedModel.collection.drop();
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
