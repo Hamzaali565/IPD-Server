@@ -18,7 +18,7 @@ router.post("/signup", async (req, res) => {
     let hashedPass = await bcrypt.hash(password, salt);
 
     const createUser = await hospitalUserModel.create({
-      userId,
+      userId: userId.toLowerCase(),
       userName,
       password: hashedPass,
       createdOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,

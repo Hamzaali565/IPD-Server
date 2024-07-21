@@ -11,7 +11,8 @@ router.post("/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
     if (!userId || !password) throw new Error("BOTH PARAMETERS ARE REQUIRED!!");
-    const userCheck = await hospitalUserModel.find({ userId });
+    let myId = userId.toLowerCase();
+    const userCheck = await hospitalUserModel.find({ userId: myId });
     if (userCheck.length === 0) throw new Error("USER DOES NOT EXIST!!");
     let match = await bcrypt.compare(password, userCheck[0].password);
     if (!match) throw new Error("YOU HAVE ENTERED WRONG PASSWORD!!");
