@@ -3,7 +3,6 @@ import {
   IPDBedModel,
   IPDWardModel,
 } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
-import moment from "moment";
 import { getCreatedOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
@@ -25,26 +24,31 @@ router.post("/ipdbeds", async (req, res) => {
   }
 });
 
-router.get("/getward", async (req, res) => {
+router.post("/ipdward", async (req, res) => {
   try {
-    const response = await IPDWardModel.find({});
+    const { wardName, createdUser } = req.body;
+    if (![wardName, createdUser].every(Boolean))
+      throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
+    const response = await IPDWardModel.create({
+      wardName,
+      createdUser,
+      createdOn: getCreatedOn(),
+    });
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
 });
 
-router.post("/ipdward", async (req, res) => {
+router.get("/getward", async (req, res) => {
   try {
-    const { wardName, createdUser } = req.body;
-    if (![wardName, createdUser].every(Boolean))
-      throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
-    const response = await IPDBedModel.create({
-      wardName,
-      createdUser,
-      createdOn: getCreatedOn(),
-    });
-    res.status(200).send({ data: response });
+    const response = await IPDWardModel.find({});
+    const updatedData = response.map((items) => ({
+      _id: items._id,
+      name: items.wardName,
+    }));
+    updatedData.unshift({ name: "--" });
+    res.status(200).send({ data: updatedData });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
