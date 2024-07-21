@@ -1,21 +1,38 @@
 import express from "express";
 import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
 import moment from "moment";
+import { getCreatedOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
 
 router.post("/ipdbeds", async (req, res) => {
   try {
-    const { wardName, bedNumber, user } = req.body;
-    if (![wardName, bedNumber, user].every(Boolean))
+    const { wardName, bedNumber, createdUser } = req.body;
+    if (![wardName, bedNumber, createdUser].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
     const ipdbed = await IPDBedModel.create({
       wardName,
       bedNumber,
-      user,
-      createdOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
+      createdUser,
+      createdOn: getCreatedOn(),
     });
     res.status(200).send({ data: ipdbed });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post("/ipdward", async (req, res) => {
+  try {
+    const { wardName, createdUser } = req.body;
+    if (![wardName, createdUser].every(Boolean))
+      throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
+    const response = await IPDBedModel.create({
+      wardName,
+      createdUser,
+      createdOn: getCreatedOn(),
+    });
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
