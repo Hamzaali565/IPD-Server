@@ -1,5 +1,8 @@
 import express from "express";
-import { IPDBedModel } from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
+import {
+  IPDBedModel,
+  IPDWardModel,
+} from "../../../DBRepo/IPD/Masters/IPDBebModel.mjs";
 import moment from "moment";
 import { getCreatedOn } from "../../../src/constants.mjs";
 
@@ -17,6 +20,15 @@ router.post("/ipdbeds", async (req, res) => {
       createdOn: getCreatedOn(),
     });
     res.status(200).send({ data: ipdbed });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get("/getward", async (req, res) => {
+  try {
+    const response = await IPDWardModel.find({});
+    res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
