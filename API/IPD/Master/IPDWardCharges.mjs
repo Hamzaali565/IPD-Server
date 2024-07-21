@@ -37,14 +37,6 @@ router.post("/ipdwardcharges", async (req, res) => {
     }
 
     if (bedDetails.length <= 0) throw new Error(" BED DETAILS ARE REQUIRED!!");
-    bedDetails.map((items, index) => {
-      if (
-        ![items.bedNumber, items.bedCharges, items.status, items.bedId].every(
-          Boolean
-        )
-      )
-        throw new Error(`SOME PARAMETERS ARE MISSING AT LINE NO. ${index + 1}`);
-    });
     const createBedCharges = await IPDWardChargesModel.create({
       party,
       wardName,
