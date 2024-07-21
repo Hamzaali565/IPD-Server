@@ -58,7 +58,7 @@ router.get("/ipdbeds", async (req, res) => {
   try {
     const { wardName } = req.query;
     if (!wardName) throw new Error("WARD NAME IS REQUIRED!!!");
-    const ipdbeds = await IPDBedModel.find({ wardName }, "bedNumber");
+    const ipdbeds = await IPDBedModel.find({ wardName });
     if (ipdbeds.length <= 0) throw new Error("NO DATA FOUNND");
     res.status(200).send({ data: ipdbeds });
   } catch (error) {
