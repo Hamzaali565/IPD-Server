@@ -66,4 +66,17 @@ router.get("/ipdadmissionbed", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
+router.put("/admmany", async (req, res) => {
+  try {
+    const response = await IPDBedModel.updateMany(
+      {},
+      { $set: { party: "" } },
+      { new: true }
+    );
+    res.status(200).send({ message: "UPDATED SUCCESSFULLY", response });
+  } catch (error) {
+    console.log("Error");
+  }
+});
 export default router;

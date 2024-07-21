@@ -107,6 +107,7 @@ router.post("/readmission", async (req, res) => {
           reserved: true,
           admissionNo,
           mrNo,
+          party,
         },
       },
       { new: true }

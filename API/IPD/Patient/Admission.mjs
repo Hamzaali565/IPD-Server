@@ -16,7 +16,6 @@ import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/Consul
 const router = express.Router();
 
 router.post("/admission", async (req, res) => {
-  console.log(" body", req.body);
   try {
     const {
       admissionType,
@@ -45,13 +44,15 @@ router.post("/admission", async (req, res) => {
     )
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
 
+    console.log(req.body);
+
     const findBed = await IPDBedModel.find({ _id: bedId });
     console.log("findBed", findBed);
     if (findBed[0]?.reserved === true)
       throw new Error("THIS  BED IS ALREADY RESERVED!!!");
 
     const findActiveBeds = await IPDWardChargesModel.find({ wardName, party });
-    if (findActiveBeds.length < 0)
+    if (findActiveBeds.length <= 0)
       throw new Error(
         "THIS WARD IS NOT ACTIVE ON THIS PARTY KINDLY CONTACT TO YOUR IT TEAM !!!"
       );
@@ -153,6 +154,7 @@ router.post("/admission", async (req, res) => {
           reserved: true,
           admissionNo: admNo,
           mrNo,
+          party,
         },
       },
       { new: true }
@@ -409,7 +411,6 @@ router.get("/admissionbed", async (req, res) => {
       return acc;
     }, {});
 
-    // Step 4: Add patientName to the original response
     const updatedResponse = response.map((item) => ({
       _id: item._id,
       mrNo: item.mrNo,
@@ -417,6 +418,7 @@ router.get("/admissionbed", async (req, res) => {
       bedNo: item?.bedNumber,
       wardName: item?.wardName,
       bedId: item?.bedId,
+      party: item?.party,
       patientName: mrNoToPatientNameMap[item.mrNo]?.patientName,
       patientType: mrNoToPatientNameMap[item.mrNo]?.patientType,
       relativeType: mrNoToPatientNameMap[item.mrNo]?.relativeType,
@@ -425,6 +427,7 @@ router.get("/admissionbed", async (req, res) => {
       cellNo: mrNoToPatientNameMap[item.mrNo]?.cellNo,
       gender: mrNoToPatientNameMap[item.mrNo]?.gender,
     }));
+
     res.status(200).send({ data: updatedResponse });
   } catch (error) {
     res.status(400).send({ message: error.message });

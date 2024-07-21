@@ -8,6 +8,7 @@ const IPDBed = new mongoose.Schema({
   reserved: { type: Boolean },
   admissionNo: { type: String },
   mrNo: { type: String },
+  party: { type: String },
 });
 
 export const IPDBedModel = mongoose.model("IPD Beds", IPDBed);
