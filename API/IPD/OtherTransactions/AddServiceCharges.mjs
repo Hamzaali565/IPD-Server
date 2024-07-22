@@ -112,7 +112,7 @@ router.get("/allRadioservices", async (req, res) => {
     const serviceCharges = await DSChargesModel.find({
       party: party,
       "serviceDetails.status": true,
-      parentName: { $in: ["CT SCAN", "ULTRA SOUND", "X-RAY", "MRI"] },
+      parentName: { $in: ["CT-SCAN", "ULTRA SOUND", "X-RAY", "MRI"] },
     });
     const allServiceDetails = serviceCharges.flatMap(
       (item) => item.serviceDetails

@@ -103,7 +103,7 @@ router.get("/radiologyservices", async (req, res) => {
     const response = await serviceNameModel.find({}, "parentName");
     if (response.length <= 0) throw new Error("NO SERVICE FOUND!!!");
 
-    const allowedServices = ["CT SCAN", "ULTRA SOUND", "X-RAY", "MRI"];
+    const allowedServices = ["CT-SCAN", "ULTRA SOUND", "X-RAY", "MRI"];
 
     const filteredServices = response.filter((service) =>
       allowedServices.includes(service.parentName)
