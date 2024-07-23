@@ -9,7 +9,7 @@ const consultant = new mongoose.Schema({
   cnic: { type: String, required: true },
   phone: { type: String },
   status: { type: Boolean, default: false },
-  updatedUser: { type: String, required: true },
-  updatedOn: { type: String },
+  createdUser: { type: String, required: true },
+  createdOn: { type: String },
 });
 export const ConsultantsModel = mongoose.model("Consultant New", consultant);

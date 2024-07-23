@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import express from "express";
 import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
 import moment from "moment";
+import { getCreatedOn } from "../../../src/constants.mjs";
 
 const router = express.Router();
 
@@ -16,10 +17,10 @@ router.post("/adddoctor", async (req, res) => {
       cnic,
       phone,
       status,
-      updatedUser,
+      createdUser,
       _id,
     } = req.body;
-    if (![name, speciality, cnic, updatedUser].every(Boolean))
+    if (![name, speciality, cnic, createdUser].every(Boolean))
       throw new Error("fields like Code, Name, Speciality, Cnic are Mendotary");
     if (_id !== "") {
       const updateConsultant = await ConsultantsModel.findOneAndUpdate(
@@ -34,8 +35,8 @@ router.post("/adddoctor", async (req, res) => {
             cnic,
             phone,
             status,
-            updatedUser,
-            updatedOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
+            createdUser,
+            createdOn: getCreatedOn(),
           },
         },
         { new: true }
@@ -52,8 +53,8 @@ router.post("/adddoctor", async (req, res) => {
       cnic,
       phone,
       status,
-      updatedUser: updatedUser,
-      updatedOn: `${moment(Date.now()).format("DD/MM/YYYY HH:mm:ss")}`,
+      createdUser: createdUser,
+      createdOn: getCreatedOn(),
     });
     console.log("created", create);
     res.status(200).send({ data: create });
