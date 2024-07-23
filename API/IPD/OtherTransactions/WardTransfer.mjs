@@ -72,6 +72,7 @@ router.post("/wardChange", async (req, res) => {
           reserved: false,
           admissionNo: "",
           mrNo: "",
+          party: "",
         },
       },
       { new: true }
@@ -84,6 +85,7 @@ router.post("/wardChange", async (req, res) => {
           reserved: true,
           admissionNo,
           mrNo,
+          party: party,
         },
       },
       { new: true }
