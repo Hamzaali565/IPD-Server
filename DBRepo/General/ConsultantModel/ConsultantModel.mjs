@@ -11,5 +11,7 @@ const consultant = new mongoose.Schema({
   status: { type: Boolean, default: false },
   createdUser: { type: String, required: true },
   createdOn: { type: String },
+  updatedUser: { type: String },
+  updatedOn: { type: String },
 });
 export const ConsultantsModel = mongoose.model("Consultant New", consultant);

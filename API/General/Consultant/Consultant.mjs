@@ -35,13 +35,13 @@ router.post("/adddoctor", async (req, res) => {
             cnic,
             phone,
             status,
-            createdUser,
-            createdOn: getCreatedOn(),
+            updatedUser: createdUser,
+            updatedOn: getCreatedOn(),
           },
         },
         { new: true }
       );
-      res.status(200).send({ data1: updateConsultant });
+      res.status(200).send({ data1: updateConsultant, message: "update" });
       return;
     }
     const create = await ConsultantsModel.create({
@@ -57,7 +57,7 @@ router.post("/adddoctor", async (req, res) => {
       createdOn: getCreatedOn(),
     });
     console.log("created", create);
-    res.status(200).send({ data: create });
+    res.status(200).send({ data: create, message: "created" });
   } catch (error) {
     res.status(400).send({ message: `${error.message}` });
   }
@@ -65,10 +65,14 @@ router.post("/adddoctor", async (req, res) => {
 
 router.get("/getconsultant", async (req, res) => {
   try {
-    let response = await ConsultantsModel.find(
-      { status: true },
-      "name speciality status"
-    );
+    const { All } = req.query;
+    let response;
+    if (!All) {
+      response = await ConsultantsModel.find({ status: true });
+      res.status(200).send({ data: response });
+      return;
+    }
+    response = await ConsultantsModel.find({});
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: `${error.message}` });
