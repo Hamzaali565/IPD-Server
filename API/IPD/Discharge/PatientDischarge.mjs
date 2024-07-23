@@ -35,6 +35,7 @@ router.put("/dischargePatient", async (req, res) => {
             admissionNo: "",
             mrNo: "",
             reserved: false,
+            party: "",
           },
         },
         { new: true }
