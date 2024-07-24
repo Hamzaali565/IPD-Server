@@ -4,14 +4,11 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import bodyParser from "body-parser";
-
 import Authentication from "./Routes/Authentications/Auth.mjs";
 import Auth from "./Routes/Authentications/Auth.mjs";
 import Prod from "./API/Product/Product.mjs";
 import MainData from "./Routes/MainRoute/MainRoute.mjs";
+import connectDB from "./src/db/database.mjs";
 
 mongoose.set("strictQuery", false);
 
@@ -38,38 +35,12 @@ const __dirname = path.resolve();
 app.use("/", express.static(path.join(__dirname, "./Frontend/build")));
 app.use("*", express.static(path.join(__dirname, "./Frontend/build")));
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
-
-const MONGODB_URI = process.env.MONGODB_URI;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-mongoose.connect(MONGODB_URI);
-
-////////////////mongodb connected disconnected events///////////////////////////////////////////////
-mongoose.connection.on("connected", function () {
-  //connected
-  console.log("Database is connected");
-});
-
-mongoose.connection.on("disconnected", function () {
-  //disconnected
-  console.log("Mongoose is disconnected");
-  process.exit(1);
-});
-
-mongoose.connection.on("error", function (err) {
-  //any error
-  console.log("Mongoose connection error: ", err);
-  process.exit(1);
-});
-
-process.on("SIGINT", function () {
-  /////this function will run just before the app is closing
-  console.log("app is terminating");
-  mongoose.connection.close(); // Remove the callback function here
-  console.log("Mongoose default connection closed");
-  process.exit(0);
-});
-////////////////mongodb connected disconnected events///////////////////////////////////////////////
+connectDB()
+.then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+        console.log(`⚙️ Server is running at port : ${process.env.PORT}`);
+    })
+})
+.catch((err) => {
+    console.log("MONGO db connection failed !!! ", err);
+})
