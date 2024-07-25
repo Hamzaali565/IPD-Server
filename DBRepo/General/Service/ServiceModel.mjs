@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const serviceName = new mongoose.Schema({
   parentName: { type: String, required: true },
   serviceName: { type: String, required: true },
-  updatedOn: { type: String },
+  createdOn: { type: String },
   createdUser: { type: String, required: true },
   updatedUser: { type: String },
 });

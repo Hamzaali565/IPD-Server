@@ -2,6 +2,7 @@ import express from "express";
 import { serviceChargesModel } from "../../../DBRepo/IPD/Masters/IPDServiceChargesModel.mjs";
 import moment from "moment";
 import { serviceNameModel } from "../../../DBRepo/General/Service/ServiceModel.mjs";
+import { DSChargesModel } from "../../../DBRepo/IPD/Masters/DSChargesModel.mjs";
 
 const router = express.Router();
 
@@ -126,6 +127,17 @@ router.put("/updateservicename", async (req, res) => {
       { new: true }
     );
     const response = await serviceChargesModel.updateMany(
+      { "serviceDetails.serviceId": serviceId },
+      {
+        $set: {
+          "serviceDetails.$[elem].serviceName": serviceName,
+        },
+      },
+      {
+        arrayFilters: [{ "elem.serviceId": serviceId }],
+      }
+    );
+    const response2 = await DSChargesModel.updateMany(
       { "serviceDetails.serviceId": serviceId },
       {
         $set: {

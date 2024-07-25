@@ -35,30 +35,15 @@ router.get("/parentservicename", async (req, res) => {
 
 router.post("/service", async (req, res) => {
   try {
-    const { parentName, serviceName, createdUser, _id } = req.body;
+    const { parentName, serviceName, createdUser } = req.body;
     if (![parentName, serviceName, createdUser].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED!!!");
-    if (_id !== "") {
-      const updateService = await serviceNameModel.findOneAndUpdate(
-        { _id: _id },
-        {
-          $set: {
-            parentName,
-            serviceName,
-            createdUser,
-            updatedOn: getCreatedOn(),
-          },
-        },
-        { new: true }
-      );
-      res.status(200).send({ data1: updateService });
-      return;
-    }
+
     const response = await serviceNameModel.create({
       parentName,
       serviceName,
       createdUser,
-      updatedOn: getCreatedOn(),
+      createdOn: getCreatedOn(),
     });
 
     res.status(200).send({ data: response });
