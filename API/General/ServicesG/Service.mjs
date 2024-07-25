@@ -69,9 +69,14 @@ router.post("/service", async (req, res) => {
 
 router.get("/service", async (req, res) => {
   try {
-    const { parentName } = req.query;
+    const { parentName, valids } = req.query;
     if (!parentName) throw new Error("PARENT NAME IS REQUIRED!!");
-    const response = await serviceNameModel.find({ parentName });
+    if (!valids) {
+      const response = await serviceNameModel.find({ parentName });
+      res.status(200).send({ data: response });
+      return;
+    }
+    const response = await serviceNameModel.find({});
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: error.message });

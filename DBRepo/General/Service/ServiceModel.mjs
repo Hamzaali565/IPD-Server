@@ -5,6 +5,7 @@ const serviceName = new mongoose.Schema({
   serviceName: { type: String, required: true },
   updatedOn: { type: String },
   createdUser: { type: String, required: true },
+  updatedUser: { type: String },
 });
 
 export const serviceNameModel = mongoose.model("Service Name", serviceName);
