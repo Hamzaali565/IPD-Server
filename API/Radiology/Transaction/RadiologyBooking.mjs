@@ -125,7 +125,6 @@ router.get("/radiologybooking", async (req, res) => {
 router.get("/radiologybookingNew", async (req, res) => {
   try {
     const { admissionNo } = req.query;
-    console.log("Admission No", admissionNo);
     if (![admissionNo].every(Boolean))
       throw new Error("ALL PARAMETERS ARE REQUIRED !!!");
     const response = await RadiologyBookingModel.find({ admissionNo });
