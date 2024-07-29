@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
-import express from "express";
-import { ConsultantsModel } from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
+import express, { response } from "express";
+import {
+  ConsultantsModel,
+  SpecialityModel,
+} from "../../../DBRepo/General/ConsultantModel/ConsultantModel.mjs";
 import moment from "moment";
 import { getCreatedOn } from "../../../src/constants.mjs";
 
@@ -11,6 +14,7 @@ router.post("/adddoctor", async (req, res) => {
     const {
       name,
       speciality,
+      specialityId,
       pmdc,
       address,
       email,
@@ -20,7 +24,7 @@ router.post("/adddoctor", async (req, res) => {
       createdUser,
       _id,
     } = req.body;
-    if (![name, speciality, cnic, createdUser].every(Boolean))
+    if (![name, speciality, specialityId, cnic, createdUser].every(Boolean))
       throw new Error("fields like Code, Name, Speciality, Cnic are Mendotary");
     if (_id !== "") {
       const updateConsultant = await ConsultantsModel.findOneAndUpdate(
@@ -33,6 +37,7 @@ router.post("/adddoctor", async (req, res) => {
             address,
             email,
             cnic,
+            specialityId,
             phone,
             status,
             updatedUser: createdUser,
@@ -47,6 +52,7 @@ router.post("/adddoctor", async (req, res) => {
     const create = await ConsultantsModel.create({
       name,
       speciality,
+      specialityId,
       pmdc,
       address,
       email,
@@ -91,6 +97,58 @@ router.get("/vectorconsultant", async (req, res) => {
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(400).send({ message: `${error.message}` });
+  }
+});
+
+router.post("/specialty", async (req, res) => {
+  try {
+    const { speciality, _id } = req.body;
+    if (!speciality) throw new Error("SPECIALITY IS REQUIRED !!!");
+    if (!_id) {
+      const response = await SpecialityModel.create({
+        speciality,
+        createdUser: req?.user?.userId,
+        createdOn: getCreatedOn(),
+      });
+      res.status(200).send({ data: response });
+      return;
+    }
+    const modifyData = await SpecialityModel.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          speciality,
+          updatedUser: req?.user?.userId,
+          updatedOn: getCreatedOn(),
+        },
+      },
+      {
+        new: true,
+      }
+    );
+
+    const updateSpecialityInConsDoc = await ConsultantsModel.updateMany(
+      { specialityId: _id },
+      {
+        $set: {
+          speciality,
+        },
+      }
+    );
+    res
+      .status(200)
+      .send({ data: response, modifyData, updateSpecialityInConsDoc });
+  } catch (error) {
+    res.status(400).send({ message: error?.message });
+  }
+});
+
+router.get("/speciality", async (req, res) => {
+  try {
+    const response = await SpecialityModel.find({});
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
   }
 });
 
