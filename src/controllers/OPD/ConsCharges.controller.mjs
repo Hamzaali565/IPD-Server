@@ -3,6 +3,7 @@ import { asyncHandler } from "../../utils/asyncHandler.mjs";
 import { ApiResponse } from "../../utils/ApiResponse.mjs";
 import { ConsChargesModel } from "../../models/OPD.Models/ConsultantCharges.model.mjs";
 import { getCreatedOn } from "../../constants.mjs";
+import moment from "moment";
 
 const OpdConsCharges = asyncHandler(async (req, res) => {
   const { consultantName, consultantId, party, partyId, amount } = req.body;
@@ -20,7 +21,7 @@ const OpdConsCharges = asyncHandler(async (req, res) => {
       $set: {
         amount,
         updatedUser: req.user?.userId,
-        updatedOn: getCreatedOn()
+        updatedOn: getCreatedOn(),
       },
     },
     { new: true }
@@ -64,10 +65,22 @@ const FindDrCharges = asyncHandler(async (req, res) => {
   const { consultantId } = req.query;
   if (!consultantId) throw new ApiError(400, "CONSULTANT ID IS REQUIRED !!!");
   const response = await ConsChargesModel.find({ consultantId });
-  if (response) {
-    return res.status(200).json(new ApiResponse(200, { data: response }));
+  if (response.length <= 0) {
+    throw new ApiError(400, "DATA NOT FOUND !!!");
   }
-  throw new ApiError(400, "DATA NOT FOUND !!!");
+  return res.status(200).json(new ApiResponse(200, { data: response }));
 });
 
-export { OpdConsCharges , FindDrCharges};
+const FindDrChargesPartyWise = asyncHandler(async (req, res) => {
+  const { consultantId, partyId } = req.query;
+  if (!consultantId) throw new ApiError(400, "CONSULTANT ID IS REQUIRED !!!");
+  const response = await ConsChargesModel.find({
+    consultantId,
+    partyId,
+  }).select("amount");
+  if (response.length <= 0) {
+    throw new ApiError(400, "DATA NOT FOUND !!!");
+  }
+  return res.status(200).json(new ApiResponse(200, { data: response }));
+});
+export { OpdConsCharges, FindDrCharges, FindDrChargesPartyWise };
