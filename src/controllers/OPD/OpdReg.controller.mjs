@@ -4,7 +4,7 @@ import { OPDRegModel } from "../../models/OPD.Models/OPDRegistration.model.mjs";
 import { ApiError } from "../../utils/ApiError.mjs";
 import { ApiResponse } from "../../utils/ApiResponse.mjs";
 import { asyncHandler } from "../../utils/asyncHandler.mjs";
-
+import { PaymentRecieptModel } from "../../../DBRepo/IPD/PaymenModels/PaymentRecieptModel.mjs";
 // opd registration
 const OPDRegistration = asyncHandler(async (req, res) => {
   const {
@@ -33,7 +33,22 @@ const OPDRegistration = asyncHandler(async (req, res) => {
     ].every(Boolean)
   )
     throw new ApiError(402, "ALL PARAMETERS ARE REQUIRED !!!");
-
+  // payment No
+  const generatePayment = async (opdNo, date) => {
+    const payment = await PaymentRecieptModel.create({
+      paymentType,
+      location,
+      paymentAgainst: "OPD Registration",
+      amount,
+      shiftNo,
+      againstNo: opdNo,
+      mrNo,
+      remarks,
+      createdUser: req?.user?.userId,
+      createdOn: date,
+    });
+    return payment;
+  };
   //   new Token
   const generateTodayToken = async () => {
     const newTokenDoc = await OPDRegModel.create({
@@ -52,9 +67,12 @@ const OPDRegistration = asyncHandler(async (req, res) => {
       shiftNo,
       compDate: await getCreatedOnDate(),
     });
-    return newTokenDoc;
+    const payment = await generatePayment(
+      newTokenDoc?.opdNo,
+      newTokenDoc?.createdOn
+    );
+    return { newTokenDoc, payment };
   };
-
   //   other token
   const generateOtherToken = async () => {
     const newTokenDoc = await OPDRegModel.create({
@@ -73,9 +91,13 @@ const OPDRegistration = asyncHandler(async (req, res) => {
       shiftNo,
       compDate: await getCreatedOnDate(),
     });
-    return newTokenDoc;
+    const payment = await generatePayment(
+      newTokenDoc?.opdNo,
+      newTokenDoc?.createdOn
+    );
+    return { newTokenDoc, payment };
   };
-
+  console.log(generateOtherToken, generateTodayToken);
   const lastDoc = await OPDRegModel.find({ consultantId })
     .sort({ tokenNo: -1 })
     .limit(1)
