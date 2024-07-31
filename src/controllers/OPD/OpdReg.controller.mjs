@@ -103,7 +103,7 @@ const OPDRegistration = asyncHandler(async (req, res) => {
   };
 
   const lastDoc = await OPDRegModel.find({ consultantId })
-    .sort({ tokenNo: -1 })
+    .sort({ opdNo: -1 })
     .limit(1)
     .exec();
   if (lastDoc.length <= 0) {
@@ -112,9 +112,11 @@ const OPDRegistration = asyncHandler(async (req, res) => {
   }
   console.log("lastDoc", lastDoc);
 
-  const todayDate = await getCreatedOnDate();
+  const todayDate = getCreatedOnDate();
   const lastDocDate = lastDoc[0]?.compDate;
 
+  console.log("today ", todayDate);
+  console.log("last doc ", lastDocDate);
   //   date1 = 31/10/2023
   // date2 = 30/10/2023
 
@@ -259,8 +261,6 @@ const OPDRefund = asyncHandler(async (req, res) => {
     mrNo,
     remarks,
   } = req.body;
-
-  console.log("req.body ", req.body);
   if (
     ![
       refundAgainst,
@@ -337,6 +337,7 @@ const OPDRefund = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, { data: updatedResponse }));
 });
+
 export {
   OPDRegistration,
   OPDToken,
