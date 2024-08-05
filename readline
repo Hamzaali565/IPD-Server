@@ -8,3 +8,8 @@ REFRESH_TOKEN_EXPIRY=10d
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
+
+
+// create party wise lab charges
+// updateMany in lab charges if me update lab/Group Name
+//create OPD Lab
