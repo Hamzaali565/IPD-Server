@@ -3,7 +3,9 @@ import { asyncHandler } from "../../utils/asyncHandler.mjs";
 import { ApiResponse } from "../../utils/ApiResponse.mjs";
 import { labTestModel } from "../../models/LAB.Models/test.model.mjs";
 import { getCreatedOn } from "../../constants.mjs";
+import { LabChargesModel } from "../../models/LAB.Models/labCharges.model.mjs";
 
+// create lab code
 const labTest = asyncHandler(async (req, res) => {
   const {
     testName,
@@ -14,20 +16,25 @@ const labTest = asyncHandler(async (req, res) => {
     active,
     style,
     testRanges,
+    groupParams,
     _id,
+    thisIs,
   } = req.body;
 
-  if (
-    ![testName, department, category, testType, reportDays, style].every(
-      Boolean
-    )
-  ) {
+  if (![testName, department, testType, reportDays, thisIs].every(Boolean)) {
     throw new ApiError(400, "All fields are required");
   }
-
+  if (thisIs === "Test") {
+    if (!category) {
+      throw new ApiError(404, "CATEGORY IS REQUIRED !!!");
+      return;
+    }
+  }
   let rangeInfo = [];
-  if (testRanges.length > 0) {
-    rangeInfo = testRanges.filter((items) => items.equipment !== "");
+  if (testRanges) {
+    if (testRanges.length > 0) {
+      rangeInfo = testRanges.filter((items) => items.equipment !== "");
+    }
   }
 
   console.log(" Equip", rangeInfo);
@@ -43,8 +50,9 @@ const labTest = asyncHandler(async (req, res) => {
       active,
       style,
       testRanges: rangeInfo,
-      thisIs: "Test",
+      thisIs,
       createdUser: req?.user?.userId,
+      groupParams,
     });
     return response;
   };
@@ -63,7 +71,7 @@ const labTest = asyncHandler(async (req, res) => {
           active,
           style,
           testRanges: rangeInfo,
-          thisIs: "Test",
+          thisIs,
           updatedUser: req?.user?.userId,
           updatedOn: getCreatedOn(),
         },
@@ -99,17 +107,91 @@ const labTest = asyncHandler(async (req, res) => {
 });
 
 // get test to show details on modal and update
-
 const LabTestToUpdate = asyncHandler(async (req, res) => {
-  const { thisIs } = req?.query;
-  console.log(thisIs);
+  let { thisIs, fGroup } = req?.query;
 
-  if (!thisIs) throw new ApiError(404, "ALL PARAMETERS ARE REQUIRED !!!");
-  const response = await labTestModel.find({
-    $or: [{ thisIs }, { department: thisIs }],
-  });
-  if (!response) throw new ApiError(402, "DATA NOT FOUND !!!");
-  res.status(200).json(new ApiResponse(200, { data: response }));
+  const response = await labTestModel.find({});
+
+  let FilterData;
+  if (thisIs === "Test") {
+    FilterData = response.filter((item) => item?.thisIs !== "Group");
+    return res.status(200).json(new ApiResponse(200, { data: FilterData }));
+  }
+  if (thisIs === "Group") {
+    FilterData = response.filter((item) => item?.thisIs == "Group");
+    return res.status(200).json(new ApiResponse(200, { data: FilterData }));
+  }
+  if (thisIs === "IAmGroupParam") {
+    FilterData = response.filter(
+      (item) =>
+        item?.thisIs !== "Group" &&
+        item?.active !== false &&
+        item?.department === fGroup
+    );
+    return res.status(200).json(new ApiResponse(200, { data: FilterData }));
+  }
 });
 
-export { labTest, LabTestToUpdate };
+// get lab charges
+const LabChargesCheck = asyncHandler(async (req, res) => {
+  const { partyName, partyId } = req?.query;
+  console.log("query", req?.query);
+
+  if (!partyName || !partyId)
+    throw new ApiError(404, "ALL PARAMETERS ARE REQUIRED !!!");
+
+  // conditional statement to get data of both tests and group
+  const testNames = await labTestModel.find({
+    $and: [
+      { active: true },
+      {
+        $or: [{ thisIs: "Test" }, { thisIs: "Group" }],
+      },
+    ],
+  });
+  // const testNames = await labTestModel.find({
+  //   $or: [{ thisIs: "Test" }, { thisIs: "Group" }, { active: true }],
+  // });
+
+  console.log(" test Name ", testNames);
+
+  const formatedData = testNames.map((items) => ({
+    testName: items?.testName,
+    testCode: items?.testCode,
+    testId: items?._id,
+    department: items?.department,
+    charges: 0,
+    status: false,
+  }));
+
+  // check if rates previously exist
+  const prevChargesCheck = await LabChargesModel.find({ partyId, partyName });
+
+  if (prevChargesCheck.length <= 0) {
+    return res.status(200).json(new ApiResponse(200, { data: formatedData }));
+  }
+
+  const idsFromPrevCharges = prevChargesCheck[0].labDetails.map((items) =>
+    items?.testId.toString()
+  );
+
+  const filterChargedIdsFromTestName = testNames.filter((items) => {
+    const testNamesId = items?._id.toString();
+    const isIncluded = idsFromPrevCharges.includes(testNamesId);
+    return !isIncluded;
+  });
+
+  const newData = [
+    ...prevChargesCheck[0]?.labDetails,
+    ...filterChargedIdsFromTestName.map((item) => ({
+      serviceName: item?.serviceName,
+      serviceId: item?._id,
+      charges: 0,
+      status: false,
+    })),
+  ];
+
+  return res.status.json(new ApiResponse(200, { data: newData }));
+});
+
+export { labTest, LabTestToUpdate, LabChargesCheck };
