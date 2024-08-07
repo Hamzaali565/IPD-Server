@@ -19,6 +19,9 @@ const LabBooking = new Schema({
   createdOn: { type: String, default: getCreatedOn() },
   updatedUser: { type: String },
   updatedOn: { type: String },
+  amount: { type: Number, required: true },
+  paymentType: { type: String, required: true },
+  location: { type: String, required: true },
   labDetails: [
     {
       testName: { type: String },
