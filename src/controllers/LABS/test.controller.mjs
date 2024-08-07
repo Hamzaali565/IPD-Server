@@ -37,8 +37,6 @@ const labTest = asyncHandler(async (req, res) => {
     }
   }
 
-  console.log(" Equip", rangeInfo);
-
   // create lab
   const createTest = async () => {
     const response = await labTestModel.create({
@@ -74,11 +72,29 @@ const labTest = asyncHandler(async (req, res) => {
           thisIs,
           updatedUser: req?.user?.userId,
           updatedOn: getCreatedOn(),
+          groupParams,
         },
       },
       { new: true }
     );
     return response;
+  };
+
+  // update Many Lab
+  const updateManyLabs = async (testId) => {
+    const updateToMany = await LabChargesModel.updateMany(
+      {
+        "labDetails.testId": testId,
+      },
+      {
+        $set: {
+          "labDetails.$.testName": testName,
+          "labDetails.$.department": department,
+          "labDetails.$.status": active,
+        },
+      }
+    );
+    return updateToMany;
   };
 
   if (!_id) {
@@ -94,13 +110,14 @@ const labTest = asyncHandler(async (req, res) => {
       );
   } else {
     const updateData = await updateTest(_id);
+    const updatedCharges = await updateManyLabs(_id);
     return res
       .status(202)
       .json(
         new ApiResponse(
           202,
-          { data: updateData },
-          "TEST Updated SUCCESSFULLY !!!"
+          { data: updateData, updatedCharges },
+          "TEST UPDATED SUCCESSFULLY !!"
         )
       );
   }
@@ -171,6 +188,8 @@ const LabChargesCheck = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, { data: formatedData }));
   }
 
+  console.log("prevChargesCheck", prevChargesCheck);
+
   const idsFromPrevCharges = prevChargesCheck[0].labDetails.map((items) =>
     items?.testId.toString()
   );
@@ -191,7 +210,76 @@ const LabChargesCheck = asyncHandler(async (req, res) => {
     })),
   ];
 
-  return res.status.json(new ApiResponse(200, { data: newData }));
+  return res.status(200).json(new ApiResponse(200, { data: newData }));
 });
 
-export { labTest, LabTestToUpdate, LabChargesCheck };
+//// push lab charges
+const LabChargesPush = asyncHandler(async (req, res) => {
+  const { partyName, partyId, labDetails } = req?.body;
+
+  if (![partyId, partyName, labDetails].every(Boolean))
+    throw new ApiError(404, "ALL PARAMETERS ARE REQUIRED !!!");
+
+  ///// Check already pushed Data
+  const checkAlreadyPushedData = await LabChargesModel.find({ partyId });
+  if (checkAlreadyPushedData.length > 0) {
+    const UpdateData = await LabChargesModel.findOneAndUpdate(
+      { partyId },
+      {
+        $set: {
+          labDetails,
+          updateUser: req.user?.userId,
+          updateOn: getCreatedOn(),
+        },
+      },
+      { new: true }
+    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { data: UpdateData },
+          "DATA UPDATED SUCCESSFULLY !!!"
+        )
+      );
+  }
+
+  const response = await LabChargesModel.create({
+    partyName,
+    partyId,
+    createdUser: req.user?.userId,
+    labDetails,
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { data: response },
+        "LAB CHARGES CREATED SUCCESSFULLY !!!"
+      )
+    );
+});
+
+/// get lab charges party wise
+const getPushedChargesData = asyncHandler(async (req, res) => {
+  const { partyId } = req.query;
+  if (!partyId) throw new ApiError(404, "ALL PARAMETERS ARE REQUIRED !!!");
+  const response = await LabChargesModel.find({ partyId });
+  if (!response)
+    throw new ApiError(400, "NO CHARGES FOUND AGAINST THIS PARTY !!!");
+  const filterData = response[0]?.labDetails.filter(
+    (items) => items?.status !== false
+  );
+  return res.status(200).json(new ApiResponse(200, { data: filterData }));
+});
+
+export {
+  labTest,
+  LabTestToUpdate,
+  LabChargesCheck,
+  LabChargesPush,
+  getPushedChargesData,
+};
