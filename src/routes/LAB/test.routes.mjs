@@ -6,7 +6,14 @@ import {
   labTest,
   LabTestToUpdate,
 } from "../../controllers/LABS/test.controller.mjs";
-import { LabBookingCreator } from "../../controllers/LABS/labBooking.controller.mjs";
+import {
+  LabBookingCreator,
+  LabDeletion,
+  PrevLabs,
+  refundAmount,
+  refundCreation,
+  singleLabPdfPrint,
+} from "../../controllers/LABS/labBooking.controller.mjs";
 
 const router = Router();
 
@@ -19,5 +26,9 @@ router.route("/labsForBooking").get(getPushedChargesData);
 
 // Lab Booking Related
 router.route("/labBooking").post(LabBookingCreator);
-
+router.route("/labBooking").get(PrevLabs);
+router.route("/labBookingForPdf").get(singleLabPdfPrint);
+router.route("/labDeletion").put(LabDeletion);
+router.route("/labRefundAmount").get(refundAmount);
+router.route("/labRefund").put(refundCreation);
 export default router;
