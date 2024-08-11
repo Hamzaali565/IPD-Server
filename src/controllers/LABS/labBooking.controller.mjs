@@ -368,26 +368,27 @@ const BiochemistryTests = asyncHandler(async (req, res) => {
   );
   if (filterlabDetails.length <= 0)
     throw new ApiError(400, "ALL TESTS ARE DELETED !!!");
-  console.log("filter details", filterlabDetails);
+
   // extract undeleted ids
   const ids = filterlabDetails.map((items) => items?.testId);
 
   // find test / group details of undeleted ids
   const BioIds = await labTestModel.find({ _id: { $in: ids } });
+  const filterBioTests = BioIds.filter(
+    (items) => items?.department === "Biochemistry"
+  );
 
   // Patient Data
   const patientData = await PatientRegModel.find({ MrNo: labData[0]?.mrNo });
 
   console.log("Bio Ids", BioIds);
-  res
-    .status(200)
-    .json(
-      new ApiResponse(200, {
-        patientData,
-        labData: BioIds,
-        labCDetails: labData,
-      })
-    );
+  res.status(200).json(
+    new ApiResponse(200, {
+      patientData,
+      labData: filterBioTests,
+      labCDetails: labData,
+    })
+  );
 });
 //exports
 export {
