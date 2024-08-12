@@ -359,7 +359,7 @@ const BiochemistryTests = asyncHandler(async (req, res) => {
   const labData = await LabBookingModel.find({ labNo });
 
   if (labData?.length <= 0) {
-    throw new ApiError(402, "NO DATA FOUND AGAINST THIS LAB NO..");
+    throw new ApiError(402, "NO DATA FOUND AGAINST THIS LAB NO.");
   }
 
   // filter Deleted Tests
@@ -367,21 +367,43 @@ const BiochemistryTests = asyncHandler(async (req, res) => {
     (items) => items?.isDeleted !== true
   );
   if (filterlabDetails.length <= 0)
-    throw new ApiError(400, "ALL TESTS ARE DELETED !!!");
+    throw new ApiError(403, "ALL TESTS ARE DELETED !!!");
 
+  // filter tests whose result already enntered
+  const filterResutledLabs = labData[0].labDetails.filter(
+    (items) => items?.resultEntry !== true
+  );
+
+  console.log("Bio Idssssdadas");
+  
   // extract undeleted ids
-  const ids = filterlabDetails.map((items) => items?.testId);
+  let ids = [];
+  if (filterResutledLabs.length <= 0) {
+    ids = filterlabDetails.map((items) => items._id);
+    return;
+  } else {
+    ids = filterResutledLabs.map((items) => items?.testId);
+  }
 
+  console.log("Bio Idsss");
   // find test / group details of undeleted ids
   const BioIds = await labTestModel.find({ _id: { $in: ids } });
   const filterBioTests = BioIds.filter(
     (items) => items?.department === "Biochemistry"
   );
 
+  console.log("Bio Idsa", filterBioTests);
+  // if (filterBioTests.length <= 0) {
+  //   throw new ApiError(
+  //     400,
+  //     `ALL RESULT ENTERED ALREADY AGAINST LAB NO ${labNo}!!!`
+  //   );
+  // }
+
   // Patient Data
   const patientData = await PatientRegModel.find({ MrNo: labData[0]?.mrNo });
 
-  console.log("Bio Ids", BioIds);
+  console.log("Bio Ids", filterBioTests);
   res.status(200).json(
     new ApiResponse(200, {
       patientData,
