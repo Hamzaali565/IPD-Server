@@ -15,7 +15,19 @@ import {
   refundCreation,
   singleLabPdfPrint,
 } from "../../controllers/LABS/labBooking.controller.mjs";
-import { labResult } from "../../controllers/LABS/labResult.controller.mjs";
+import {
+  bioGroupResult,
+  getChildData,
+  getDataToEdit,
+  getNewRanges,
+  labResult,
+  LabSpecimen,
+  labSpecimenDisp,
+  MicroDataParentForw,
+  microscopyData,
+  microscopyParent,
+  updateLabResult,
+} from "../../controllers/LABS/labResult.controller.mjs";
 
 const router = Router();
 
@@ -25,6 +37,12 @@ router.route("/tests").get(LabTestToUpdate);
 router.route("/testsCharges").get(LabChargesCheck);
 router.route("/testsChargesPush").post(LabChargesPush);
 router.route("/labsForBooking").get(getPushedChargesData);
+router.route("/labSpecimen").post(LabSpecimen);
+router.route("/labSpecimenDisp").get(labSpecimenDisp);
+router.route("/labMicroData").post(microscopyData);
+router.route("/labMicroDataParent").post(microscopyParent);
+router.route("/labMicroData").get(MicroDataParentForw);
+router.route("/labMicroDataChild").get(getChildData);
 
 // Lab Booking Related
 router.route("/labBooking").post(LabBookingCreator);
@@ -39,5 +57,12 @@ router.route("/biochemistry").get(BiochemistryTests);
 
 // lab result Entry
 router.route("/labResultEntry").post(labResult);
+router.route("/bioGroupRanges").post(bioGroupResult);
+
+// lab Data for Edit
+router.route("/resultEdit").get(getDataToEdit);
+router.route("/editRanges").post(getNewRanges);
+// lab Update
+router.route("/resultUpdate").post(updateLabResult);
 
 export default router;

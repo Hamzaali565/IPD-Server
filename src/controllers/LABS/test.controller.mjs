@@ -4,6 +4,9 @@ import { ApiResponse } from "../../utils/ApiResponse.mjs";
 import { labTestModel } from "../../models/LAB.Models/test.model.mjs";
 import { getCreatedOn } from "../../constants.mjs";
 import { LabChargesModel } from "../../models/LAB.Models/labCharges.model.mjs";
+import { labResultModel } from "../../models/LAB.Models/labResult.model.mjs";
+import { PatientRegModel } from "../../../DBRepo/IPD/PatientModel/PatientRegModel.mjs";
+import { LabBookingModel } from "../../models/LAB.Models/LabBooking.model.mjs";
 
 // create lab code
 const labTest = asyncHandler(async (req, res) => {
@@ -91,6 +94,17 @@ const labTest = asyncHandler(async (req, res) => {
           "labDetails.$.testName": testName,
           "labDetails.$.department": department,
           "labDetails.$.status": active,
+        },
+      }
+    );
+
+    const updateNameInGroup = await labTestModel.updateMany(
+      {
+        "groupParams.testId": testId,
+      },
+      {
+        $set: {
+          "groupParams.$.testName": testName,
         },
       }
     );
@@ -203,12 +217,15 @@ const LabChargesCheck = asyncHandler(async (req, res) => {
   const newData = [
     ...prevChargesCheck[0]?.labDetails,
     ...filterChargedIdsFromTestName.map((item) => ({
-      serviceName: item?.serviceName,
-      serviceId: item?._id,
+      testName: item?.testName,
+      testCode: item?.testCode,
+      testId: item?._id,
       charges: 0,
       status: false,
     })),
   ];
+
+  console.log("New Data ", newData);
 
   return res.status(200).json(new ApiResponse(200, { data: newData }));
 });
@@ -275,6 +292,7 @@ const getPushedChargesData = asyncHandler(async (req, res) => {
   );
   return res.status(200).json(new ApiResponse(200, { data: filterData }));
 });
+
 
 export {
   labTest,

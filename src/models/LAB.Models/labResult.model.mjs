@@ -9,7 +9,9 @@ const labResult = new Schema({
   resultDepart: { type: String, required: true },
   resultData: { type: Array, required: true },
   updatedUser: { type: String },
-  updatedDate: { type: String },
+  updatedOn: { type: String },
+  testName: { type: String, required: true },
+  testId: { type: String, required: true },
 });
 
 export const labResultModel = model("LabResult", labResult);

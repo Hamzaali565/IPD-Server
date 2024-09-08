@@ -1,1 +1,140 @@
-// useTransition in react
+const newTestRanges = [
+  {
+    testRanges: 'male range',
+    testName: 'LFT',
+    category: 'Test',
+    testCode: 1,
+    serialNo: 1,
+    min: '12',
+    max: '12',
+    unit: '$$$$$$$$',
+    italic: false,
+    bold: true,
+    underline: true,
+    fontSize: '8px',
+    result: 'semen',
+    remarks: 'gmen'
+  },
+  {
+    testName: 'NEUTROPHILS',
+    category: 'Heading',
+    testCode: 10,
+    serialNo: 2,
+    italic: true,
+    bold: true,
+    underline: true,
+    fontSize: '10px'
+  },
+  {
+    testRanges: '26 - 30',
+    testName: 'CBC ESR',
+    category: 'Test',
+    testCode: 3,
+    serialNo: 3,
+    min: '1',
+    max: '12',
+    unit: '%',
+    italic: false,
+    bold: true,
+    underline: true,
+    fontSize: '8px',
+    result: 'Cetto',
+    remarks: 'bettto'
+  },
+  {
+    testName: 'LYMPHOCYTES',
+    category: 'Heading',
+    testCode: 11,
+    serialNo: 4,
+    italic: true,
+    bold: true,
+    underline: false,
+    fontSize: '12px'
+  },
+  {
+    testName: 'PFT',
+    category: 'Heading',
+    testCode: 2,
+    serialNo: 5,
+    italic: true,
+    bold: true,
+    underline: false,
+    fontSize: '10px'
+  }
+]
+
+
+const Result = [
+  {
+    testName: 'LFT',
+    testCode: 1,
+    normalRanges: 'mallla',
+    category: 'Test',
+    serialNo: 1,
+    unit: '....................',
+    min: '12',
+    max: '30',
+    italic: false,
+    bold: true,
+    underline: true,
+    fontSize: '8px'
+  },
+  {
+    testName: 'NEUTROPHILS',
+    testCode: 10,
+    normalRanges: null,
+    category: 'Heading',
+    serialNo: 2,
+    unit: undefined,
+    min: undefined,
+    max: undefined,
+    italic: true,
+    bold: true,
+    underline: true,
+    fontSize: '10px'
+  },
+  {
+    testName: 'CBC ESR',
+    testCode: 3,
+    normalRanges: '56 89 89',
+    category: 'Test',
+    serialNo: 3,
+    unit: '{{{{{{{{{{------------}}}}}}}}}',
+    min: '365',
+    max: '231',
+    italic: false,
+    bold: true,
+    underline: true,
+    fontSize: '8px'
+  },
+  {
+    testName: 'LYMPHOCYTES',
+    testCode: 11,
+    normalRanges: null,
+    category: 'Heading',
+    serialNo: 4,
+    unit: undefined,
+    min: undefined,
+    max: undefined,
+    italic: true,
+    bold: true,
+    underline: false,
+    fontSize: '12px'
+  },
+  {
+    testName: 'PFT',
+    testCode: 2,
+    normalRanges: null,
+    category: 'Heading',
+    serialNo: 5,
+    unit: undefined,
+    min: undefined,
+    max: undefined,
+    italic: true,
+    bold: true,
+    underline: false,
+    fontSize: '10px'
+  }
+]
+
+/// call data from 'lab/resultEdit'

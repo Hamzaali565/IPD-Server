@@ -350,10 +350,10 @@ const refundCreation = asyncHandler(async (req, res) => {
 });
 
 // getting test for biochemistry
-
 const BiochemistryTests = asyncHandler(async (req, res) => {
-  const { labNo } = req.query;
-  if (!labNo) throw new ApiError(401, "LAB NO IS REQUIRED !!!");
+  const { labNo, department } = req.query;
+  if (!labNo || !department) throw new ApiError(401, "LAB NO IS REQUIRED !!!");
+  console.log("department ", department);
 
   // get registered lab
   const labData = await LabBookingModel.find({ labNo });
@@ -374,31 +374,24 @@ const BiochemistryTests = asyncHandler(async (req, res) => {
     (items) => items?.resultEntry !== true
   );
 
-  console.log("Bio Idssssdadas");
-  
-  // extract undeleted ids
-  let ids = [];
-  if (filterResutledLabs.length <= 0) {
-    ids = filterlabDetails.map((items) => items._id);
-    return;
-  } else {
-    ids = filterResutledLabs.map((items) => items?.testId);
-  }
+  if (filterResutledLabs.length <= 0)
+    throw new ApiError(401, "ALL RESULTS ARE ENTERED !!!");
 
-  console.log("Bio Idsss");
+  // extract undeleted ids
+  let ids = filterResutledLabs.map((items) => items?.testId);
+
   // find test / group details of undeleted ids
   const BioIds = await labTestModel.find({ _id: { $in: ids } });
   const filterBioTests = BioIds.filter(
-    (items) => items?.department === "Biochemistry"
+    (items) => items?.department === department
   );
 
-  console.log("Bio Idsa", filterBioTests);
-  // if (filterBioTests.length <= 0) {
-  //   throw new ApiError(
-  //     400,
-  //     `ALL RESULT ENTERED ALREADY AGAINST LAB NO ${labNo}!!!`
-  //   );
-  // }
+console.log("BIO IDS ", BioIds);
+
+
+  if (filterBioTests.length <= 0) {
+    throw new ApiError(400, `NO TEST FOR BIOCHEMISTRY !!!`);
+  }
 
   // Patient Data
   const patientData = await PatientRegModel.find({ MrNo: labData[0]?.mrNo });
@@ -412,6 +405,7 @@ const BiochemistryTests = asyncHandler(async (req, res) => {
     })
   );
 });
+
 //exports
 export {
   LabBookingCreator,
