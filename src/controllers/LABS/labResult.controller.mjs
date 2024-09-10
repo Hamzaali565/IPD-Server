@@ -535,6 +535,12 @@ const UpdateChild = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, { data: response }));
 });
 
+const allDataWithChild = asyncHandler(async (req, res) => {
+  const response = await MicroscopyDataModel.find();
+  if (response.length <= 0) throw new ApiError(404, "NO DATA FOUND !!!");
+  return res.status(200).json(new ApiResponse(200, { data: response }));
+});
+
 export {
   labResult,
   bioGroupResult,
@@ -548,4 +554,5 @@ export {
   MicroDataParentForw,
   getChildData,
   UpdateChild,
+  allDataWithChild,
 };
