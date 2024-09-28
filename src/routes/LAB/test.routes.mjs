@@ -27,6 +27,7 @@ import {
   MicroDataParentForw,
   microscopyData,
   microscopyParent,
+  microscopyResult,
   UpdateChild,
   updateLabResult,
 } from "../../controllers/LABS/labResult.controller.mjs";
@@ -61,6 +62,7 @@ router.route("/biochemistry").get(BiochemistryTests);
 
 // lab result Entry
 router.route("/labResultEntry").post(labResult);
+router.route("/labResultMicroscopy").post(microscopyResult);
 router.route("/bioGroupRanges").post(bioGroupResult);
 
 // lab Data for Edit

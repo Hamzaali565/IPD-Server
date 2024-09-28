@@ -1,7 +1,10 @@
 import { asyncHandler } from "../../utils/asyncHandler.mjs";
 import { ApiError } from "../../utils/ApiError.mjs";
 import { ApiResponse } from "../../utils/ApiResponse.mjs";
-import { labResultModel } from "../../models/LAB.Models/labResult.model.mjs";
+import {
+  labResultModel,
+  microscopyResultModel,
+} from "../../models/LAB.Models/labResult.model.mjs";
 import { LabChargesModel } from "../../models/LAB.Models/labCharges.model.mjs";
 import { LabBookingModel } from "../../models/LAB.Models/LabBooking.model.mjs";
 import { labTestModel } from "../../models/LAB.Models/test.model.mjs";
@@ -541,6 +544,42 @@ const allDataWithChild = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, { data: response }));
 });
 
+// microscopy Result
+const microscopyResult = asyncHandler(async (req, res) => {
+  const {
+    mrNo,
+    labNo,
+    resultDepart,
+    testName,
+    testId,
+    specimen,
+    znStain,
+    microscopy,
+    culture,
+    gramStain,
+    microscoptData,
+    organism,
+  } = req.body;
+  if (![mrNo, labNo, resultDepart, testName, testId].every(Boolean))
+    throw new ApiError(401, "ALL PARAMETERS ARE REQUIRED !!!");
+  const response = await microscopyResultModel.create({
+    mrNo,
+    labNo,
+    resultDepart,
+    testName,
+    testId,
+    specimen,
+    znStain,
+    microscopy,
+    culture,
+    gramStain,
+    microscoptData,
+    organism,
+    createdUser: req?.user?.userID,
+  });
+  res.status(200).json(new ApiResponse(200, { data: response }));
+});
+
 export {
   labResult,
   bioGroupResult,
@@ -555,4 +594,5 @@ export {
   getChildData,
   UpdateChild,
   allDataWithChild,
+  microscopyResult,
 };
