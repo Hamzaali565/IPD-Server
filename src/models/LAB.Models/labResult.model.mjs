@@ -31,7 +31,7 @@ const microscopyResult = new Schema({
   microscopy: { type: Array },
   culture: { type: Array },
   gramStain: { type: Array },
-  microscoptData: { type: Array },
+  microscopyData: { type: Array },
   organism: { type: Array },
 });
 

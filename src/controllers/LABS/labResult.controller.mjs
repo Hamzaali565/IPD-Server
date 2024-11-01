@@ -557,9 +557,25 @@ const microscopyResult = asyncHandler(async (req, res) => {
     microscopy,
     culture,
     gramStain,
-    microscoptData,
+    microscopyData,
     organism,
   } = req.body;
+  console.log({
+    mrNo,
+    labNo,
+    resultDepart,
+    testName,
+    testId,
+    specimen,
+    znStain,
+    microscopy,
+    culture,
+    gramStain,
+    microscopyData,
+    organism,
+    user: req?.user?.userId,
+  });
+
   if (![mrNo, labNo, resultDepart, testName, testId].every(Boolean))
     throw new ApiError(401, "ALL PARAMETERS ARE REQUIRED !!!");
   const response = await microscopyResultModel.create({
@@ -573,10 +589,16 @@ const microscopyResult = asyncHandler(async (req, res) => {
     microscopy,
     culture,
     gramStain,
-    microscoptData,
+    microscopyData,
     organism,
-    createdUser: req?.user?.userID,
+    createdUser: req?.user?.userId,
   });
+
+  const updateTestEntry = await LabBookingModel.findOneAndUpdate(
+    { "labDetails.testId": testId },
+    { $set: { "labDetails.$.resultEntry": true } },
+    { new: true }
+  );
   res.status(200).json(new ApiResponse(200, { data: response }));
 });
 
